@@ -30,6 +30,7 @@ struct Bullet
 	float px, py;
 	int w,  h;
 	int speed;
+	bool used = false;
 	Bullet(float x, float y, int width, int height, int s) : px(x), py(y), w(width), h(height), speed(s) {}
 };
 
@@ -38,18 +39,20 @@ struct Obstacle
 	float px, py;
 	int w, h;
 	int speed;
+	bool destroyed = false;
 	Obstacle(float x, float y, int width, int height, int s) : px(x), py(y), w(width), h(height), speed(s){}
 };
 
+ 
 bool obstacleRemovable(const Obstacle& o)
 {
-	return o.py > SCREEN_HEIGHT;
+	return o.py > SCREEN_HEIGHT || o.destroyed;
 }
 
 
 bool bulletRemovable(const Bullet& b)
 {
-	return b.py < 0;
+	return b.py < 0 || b.used;
 }
 
 class Example : public olc::PixelGameEngine
@@ -79,9 +82,9 @@ public:
 	}
 	bool OnUserUpdate(float fElapsedTime) override
 	{
-		if (GetKey(olc::Key::LEFT).bHeld)
+		if (GetKey(olc::Key::LEFT).bHeld || GetKey(olc::Key::A).bHeld)
 			ship.px -= 2;
-		if (GetKey(olc::Key::RIGHT).bHeld)
+		if (GetKey(olc::Key::RIGHT).bHeld || GetKey(olc::Key::D).bHeld)
 			ship.px += 2;
 		if (GetKey(olc::Key::SPACE).bPressed)
 		{
@@ -98,27 +101,39 @@ public:
 		timePassed += fElapsedTime;
 		if (score < 5 && timePassed > 5)
 		{
+			//std::cout << "Proslo 5 sekundi." << std::endl;
 			Obstacle o(rand() % ScreenWidth(), 0, 8, 8, 1);
 			obstacles.push_back(o);
 			timePassed = 0.0f;
 		}
 		else if (score >= 5 && score < 10 && timePassed > 4)
 		{
-			Obstacle o(rand() % ScreenWidth(), 0, 8, 8, 2);
-			obstacles.push_back(o);
+			//std::cout << "Proslo 4 sekunde." << std::endl;
+			for (int i = 0; i < 2; ++i)
+			{
+				Obstacle o(rand() % ScreenWidth(), -20 * i, 8, 8, 2);
+				obstacles.push_back(o);
+			}
 			timePassed = 0.0f;
 		}
 		else if (score >= 10 && score < 15 && timePassed > 3)
 		{
-			Obstacle o(rand() % ScreenWidth(), 0, 8, 8, 3);
-			obstacles.push_back(o);
+			for (int i = 0; i < 3; ++i)
+			{
+				Obstacle o(rand() % ScreenWidth(), -20 * i, 8, 8, 3);
+				obstacles.push_back(o);
+			}
+			
 			timePassed = 0.0f;
 		}
 
 		else if (score >= 15 && score < 20 && timePassed > 2)
 		{
-			Obstacle o(rand() % ScreenWidth(), 0, 8, 8, 4);
-			obstacles.push_back(o);
+			for (int i = 0; i < 4; ++i)
+			{
+				Obstacle o(rand() % ScreenWidth(), -20 * i, 8, 8, 4);
+				obstacles.push_back(o);
+			}
 			timePassed = 0.0f;
 		}
 
@@ -138,7 +153,25 @@ public:
 				obstacles[i].py += obstacles[i].speed;
 			}
 		}
-	
+
+		for (int i = 0; i < obstacles.size(); ++i)
+		{
+			for (int j = 0; j < bullets.size(); ++j)
+			{
+				if (squareSquareCollision(obstacles[i].px, obstacles[i].py, bullets[j].px, bullets[j].py, obstacles[i].w, bullets[j].w))
+				{
+					obstacles[i].destroyed = true;
+					bullets[j].used = true;
+					score += 1;
+				}
+			}
+		}
+
+		//remove bullets that went out of bounds
+		bullets.erase(std::remove_if(bullets.begin(), bullets.end(), bulletRemovable), bullets.end());
+
+		//remove obstacles that went out of bounds
+		obstacles.erase(std::remove_if(obstacles.begin(), obstacles.end(), obstacleRemovable), obstacles.end());
 			
 		//clear screen	
 		FillRect(0, 0, ScreenWidth(), ScreenHeight(), olc::BLACK);
@@ -146,13 +179,6 @@ public:
 		//draw ship
 		DrawRect(ship.px, ship.py, ship.w, ship.h, olc::DARK_CYAN);
 		FillRect(ship.px, ship.py, ship.w, ship.h, olc::DARK_CYAN);
-
-
-		//remove bullets that went out of bound
-		bullets.erase(std::remove_if(bullets.begin(), bullets.end(), bulletRemovable), bullets.end());
-
-		//remove obstacles that went out of bounds
-		obstacles.erase(std::remove_if(obstacles.begin(), obstacles.end(), obstacleRemovable), obstacles.end());
 		
 
 		//draw bullets
