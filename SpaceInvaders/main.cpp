@@ -7,7 +7,6 @@
 #include <thread>
 #define SCREEN_HEIGHT 400
 
-// Override base class with your custom functionality
 
 bool squareSquareCollision(float x1, float y1, float x2, float y2, int w1, int w2)
 {
@@ -17,7 +16,6 @@ bool squareSquareCollision(float x1, float y1, float x2, float y2, int w1, int w
 }
 
 	
-
 struct Ship
 {
 	float px, py;
@@ -71,7 +69,6 @@ public:
 public:
 	bool OnUserCreate() override
 	{
-		// Called once at the start, so create things here
 		ship.px = 150;
 		ship.py = 350;
 		ship.w = 10;
@@ -111,7 +108,7 @@ public:
 			//std::cout << "Proslo 4 sekunde." << std::endl;
 			for (int i = 0; i < 2; ++i)
 			{
-				Obstacle o(rand() % ScreenWidth(), -20 * i, 8, 8, 2);
+				Obstacle o(rand() % ScreenWidth(), -40 * i, 8, 8, 2);
 				obstacles.push_back(o);
 			}
 			timePassed = 0.0f;
@@ -120,7 +117,7 @@ public:
 		{
 			for (int i = 0; i < 3; ++i)
 			{
-				Obstacle o(rand() % ScreenWidth(), -20 * i, 8, 8, 3);
+				Obstacle o(rand() % ScreenWidth(), -40 * i, 8, 8, 3);
 				obstacles.push_back(o);
 			}
 			
@@ -131,7 +128,7 @@ public:
 		{
 			for (int i = 0; i < 4; ++i)
 			{
-				Obstacle o(rand() % ScreenWidth(), -20 * i, 8, 8, 4);
+				Obstacle o(rand() % ScreenWidth(), -40 * i, 8, 8, 4);
 				obstacles.push_back(o);
 			}
 			timePassed = 0.0f;
