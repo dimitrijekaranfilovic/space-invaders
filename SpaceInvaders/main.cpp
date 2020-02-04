@@ -108,7 +108,7 @@ public:
 			//std::cout << "Proslo 4 sekunde." << std::endl;
 			for (int i = 0; i < 2; ++i)
 			{
-				Obstacle o(rand() % ScreenWidth(), -40 * i, 8, 8, 2);
+				Obstacle o(rand() % ScreenWidth(), -100 * i, 8, 8, 2);
 				obstacles.push_back(o);
 			}
 			timePassed = 0.0f;
@@ -117,7 +117,7 @@ public:
 		{
 			for (int i = 0; i < 3; ++i)
 			{
-				Obstacle o(rand() % ScreenWidth(), -40 * i, 8, 8, 3);
+				Obstacle o(rand() % ScreenWidth(), -100 * i, 8, 8, 3);
 				obstacles.push_back(o);
 			}
 			
@@ -128,7 +128,7 @@ public:
 		{
 			for (int i = 0; i < 4; ++i)
 			{
-				Obstacle o(rand() % ScreenWidth(), -40 * i, 8, 8, 4);
+				Obstacle o(rand() % ScreenWidth(), -200 * i, 8, 8, 4);
 				obstacles.push_back(o);
 			}
 			timePassed = 0.0f;
