@@ -3,7 +3,20 @@
 #include <vector>
 #include <string>
 #include <iostream>
+#include <chrono>
+#include <thread>
+#define SCREEN_HEIGHT 400
+
 // Override base class with your custom functionality
+
+bool squareSquareCollision(float x1, float y1, float x2, float y2, int w1, int w2)
+{
+	if (x1 + w1 > x2 && x2 + w2 > x1 && y1 + w1 > y2 && y2 + w2 > y1)
+		return true;
+	return false;
+}
+
+	
 
 struct Ship
 {
@@ -27,6 +40,17 @@ struct Obstacle
 	int speed;
 	Obstacle(float x, float y, int width, int height, int s) : px(x), py(y), w(width), h(height), speed(s){}
 };
+
+bool obstacleRemovable(const Obstacle& o)
+{
+	return o.py > SCREEN_HEIGHT;
+}
+
+
+bool bulletRemovable(const Bullet& b)
+{
+	return b.py < 0;
+}
 
 class Example : public olc::PixelGameEngine
 {
@@ -98,23 +122,41 @@ public:
 			timePassed = 0.0f;
 		}
 
+
+
 		//update obstacles' positions
 		for (int i = 0; i < obstacles.size(); ++i)
 		{
-			obstacles[i].py += obstacles[i].speed;
+			if (squareSquareCollision(ship.px, ship.py, obstacles[i].px, obstacles[i].py, ship.w, obstacles[i].w))
+			{
+				std::cout << "GAME OVER!\n" << "Your score was: " << score << std::endl;
+				std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+				exit(0);
+			}
+			else
+			{
+				obstacles[i].py += obstacles[i].speed;
+			}
 		}
+	
 			
-
-
 		//clear screen	
 		FillRect(0, 0, ScreenWidth(), ScreenHeight(), olc::BLACK);
 		
 		//draw ship
 		DrawRect(ship.px, ship.py, ship.w, ship.h, olc::DARK_CYAN);
 		FillRect(ship.px, ship.py, ship.w, ship.h, olc::DARK_CYAN);
+
+
+		//remove bullets that went out of bound
+		bullets.erase(std::remove_if(bullets.begin(), bullets.end(), bulletRemovable), bullets.end());
+
+		//remove obstacles that went out of bounds
+		obstacles.erase(std::remove_if(obstacles.begin(), obstacles.end(), obstacleRemovable), obstacles.end());
 		
+
 		//draw bullets
-		for (int i = 0; i < bullets.size(); i++)
+		for (int i = 0; i < bullets.size(); ++i)
 		{
 			DrawRect(bullets[i].px, bullets[i].py, bullets[i].w, bullets[i].h, olc::DARK_GREY);
 			FillRect(bullets[i].px, bullets[i].py, bullets[i].w, bullets[i].h, olc::DARK_GREY);
@@ -137,7 +179,8 @@ public:
 int main()
 {
 	Example demo;
-	if (demo.Construct(400, 400, 2, 2))
+	if (demo.Construct(400, SCREEN_HEIGHT, 2, 2))
 		demo.Start();
+	
 	return 0;
 }
