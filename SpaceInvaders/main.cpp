@@ -37,7 +37,7 @@ struct Ship
 	int w = 10;
 	int h = 10;
 	bool indestructible = false;
-	float speedQuotient = 1.0f;
+	//float speedQuotient = 1.0f;
 
 };
 
@@ -72,6 +72,8 @@ public:
 	olc::Sprite speedSprite;
 	olc::Sprite doublePointSprite;
 	Ship ship;
+	int prizeDurationLimit = 3;
+	float currentPrizeDuration = 0;
 	int pointCount = 1;
 	int score = 0;
 	int timeBound = 5;
@@ -83,6 +85,7 @@ public:
 	float timePassed = 0;
 	int bulletSpeed = 3;
 	float prizeSpeed = 0.8f;
+	bool countPrize = false;
 	std::vector<Bullet> bullets;
 	std::vector<Obstacle> obstacles;
 	std::vector<Prize> prizes;
@@ -106,10 +109,10 @@ public:
 	bool OnUserUpdate(float fElapsedTime) override
 	{
 		if ((GetKey(olc::Key::LEFT).bHeld || GetKey(olc::Key::A).bHeld) && ship.px > 0)
-			ship.px -= ship.speed * ship.speedQuotient;
+			ship.px -= ship.speed;
 
 		if ((GetKey(olc::Key::RIGHT).bHeld || GetKey(olc::Key::D).bHeld) && ship.px < ScreenWidth() - shipSprite.width)
-			ship.px += ship.speed * ship.speedQuotient;
+			ship.px += ship.speed;
 
 
 		if (GetKey(olc::Key::SPACE).bPressed)
@@ -124,7 +127,6 @@ public:
 
 		//add obstacles
 		timePassed += fElapsedTime;
-		//std::cout << score << ", " << scoreLowerBound << ", " << scoreUpperBound << ", " << timeBound << std::endl;
 		if ((score >= scoreLowerBound) && (score < scoreUpperBound) && (timePassed > timeBound))
 		{
 			for (int i = 0; i < numObstacles; ++i)
@@ -145,7 +147,7 @@ public:
 		//update obstacles' positions
 		for (int i = 0; i < obstacles.size(); ++i)
 		{
-			if (squareSquareCollision(ship.px, ship.py, obstacles[i].px, obstacles[i].py, ship.w, obstacles[i].w) && !ship.indestructible)
+			if (squareSquareCollision(ship.px, ship.py, obstacles[i].px, obstacles[i].py, ship.w, meteorSprite.width) && !ship.indestructible)
 			{
 				std::cout << "GAME OVER!\n" << "Your score was: " << score << std::endl;
 				std::this_thread::sleep_for(std::chrono::milliseconds(2000));
@@ -157,6 +159,48 @@ public:
 			}
 		}
 
+
+		//count the time untill prize's effects wear off
+		if (countPrize)
+		{
+			currentPrizeDuration += fElapsedTime;
+			if (currentPrizeDuration > prizeDurationLimit)
+			{
+				//reset parameters
+				countPrize = false;
+				currentPrizeDuration = 0;
+				pointCount = 1;
+				ship.indestructible = false;
+				ship.speed = 2.0f;
+			}
+		}
+			
+
+		//check if any of the prizes was collected and apply its effects
+		for(int i = 0; i < prizes.size();++i)
+		{
+			
+			if (squareSquareCollision(ship.px, ship.py, prizes[i].px, prizes[i].py, ship.w, speedSprite.width))
+			{
+				prizes[i].collected = true;
+				countPrize = true;
+				switch (prizes[i].kind)
+				{
+				case Prize::DOUBLE_POINT:
+					pointCount = 2;
+					break;
+				case Prize::INDESTRUCTIBLE:
+					ship.indestructible = true;
+					break;
+				case Prize::SPEED:
+					ship.speed = 6.0f;
+					break;
+				default:
+					break;
+				}
+			}
+		}
+		std::cout << currentPrizeDuration << std::endl;
 		//check if any of the obstacles were destroyed and update parameters
 		for (int i = 0; i < obstacles.size(); ++i)
 		{
@@ -234,11 +278,11 @@ public:
 			else if (prizes[i].kind == Prize::INDESTRUCTIBLE)
 				pointer = &indestructibleSprite;
 			DrawSprite(prizes[i].px, prizes[i].py, pointer);
-			//std::cout << "Crtam nagradu na poziciji: " << prizes[i].px << ", " << prizes[i].py << std::endl;
 		}
 
 		//display score
 		DrawString(0, 0, "Score: " + std::to_string(score), olc::DARK_YELLOW);
+
 
 		return true;
 	}
