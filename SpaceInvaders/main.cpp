@@ -76,10 +76,17 @@ public:
 	}
 	bool OnUserUpdate(float fElapsedTime) override
 	{
-		if (GetKey(olc::Key::LEFT).bHeld || GetKey(olc::Key::A).bHeld && ship.px > 0)
-			ship.px -= 2;
-		if (GetKey(olc::Key::RIGHT).bHeld || GetKey(olc::Key::D).bHeld)
+		if ((GetKey(olc::Key::LEFT).bHeld || GetKey(olc::Key::A).bHeld) && ship.px > 0)
+		{			
+				ship.px -= 2;
+		}
+		
+		if ((GetKey(olc::Key::RIGHT).bHeld || GetKey(olc::Key::D).bHeld) && ship.px < ScreenWidth() - shipSprite.width)
+		{
 			ship.px += 2;
+			std::cout << ship.px << std::endl;
+		}
+			
 		if (GetKey(olc::Key::SPACE).bPressed)
 		{
 			Bullet b((ship.px + bulletSprite.width / 2), ship.py, bulletSprite.width, bulletSprite.height, 3);
