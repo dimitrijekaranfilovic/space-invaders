@@ -36,9 +36,9 @@ struct Obstacle
 {
 	float px, py;
 	int w, h;
-	int speed;
+	float speed;
 	bool destroyed = false;
-	Obstacle(float x, float y, int width, int height, int s) : px(x), py(y), w(width), h(height), speed(s){}
+	Obstacle(float x, float y, int width, int height, float s) : px(x), py(y), w(width), h(height), speed(s){}
 };
 
 
@@ -96,7 +96,7 @@ public:
 		if (score < 5 && timePassed > 5)
 		{
 			//std::cout << "Proslo 5 sekundi." << std::endl;
-			Obstacle o(rand() % ScreenWidth(), 0, meteorSprite.width, meteorSprite.height, 1);
+			Obstacle o(rand() % ScreenWidth(), 0, meteorSprite.width, meteorSprite.height, 0.5);
 			obstacles.push_back(o);
 			timePassed = 0.0f;
 		}
@@ -105,7 +105,7 @@ public:
 			//std::cout << "Proslo 4 sekunde." << std::endl;
 			for (int i = 0; i < 2; ++i)
 			{
-				Obstacle o(rand() % ScreenWidth(), -100 * i, meteorSprite.width, meteorSprite.height, 2);
+				Obstacle o(rand() % ScreenWidth(), -100 * i, meteorSprite.width, meteorSprite.height, 1.25);
 				obstacles.push_back(o);
 			}
 			timePassed = 0.0f;
@@ -114,7 +114,7 @@ public:
 		{
 			for (int i = 0; i < 3; ++i)
 			{
-				Obstacle o(rand() % ScreenWidth(), -100 * i, meteorSprite.width, meteorSprite.height, 3);
+				Obstacle o(rand() % ScreenWidth(), -100 * i, meteorSprite.width, meteorSprite.height, 2.0f);
 				obstacles.push_back(o);
 			}
 			
@@ -125,7 +125,7 @@ public:
 		{
 			for (int i = 0; i < 4; ++i)
 			{
-				Obstacle o(rand() % ScreenWidth(), -200 * i, meteorSprite.width, meteorSprite.height, 4);
+				Obstacle o(rand() % ScreenWidth(), -200 * i, meteorSprite.width, meteorSprite.height, 2.75f);
 				obstacles.push_back(o);
 			}
 			timePassed = 0.0f;
