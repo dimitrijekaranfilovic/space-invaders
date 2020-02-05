@@ -262,6 +262,15 @@ public:
 		//display score
 		DrawString(0, 0, "Score: " + std::to_string(score), olc::DARK_YELLOW);
 
+		//prize time remaining
+		if (ship.indestructible)
+			DrawString(100, 0, "Indestructible time remaining: " + std::to_string(prizeDurationLimit - currentPrizeDuration), olc::DARK_YELLOW);
+		if(pointCount > 1)
+			DrawString(100, 30, "Double point time remaining: " + std::to_string(prizeDurationLimit - currentPrizeDuration), olc::DARK_YELLOW);
+		if(ship.speed > 2.0f)
+			DrawString(100, 60, "Speed boost time remaining: " + std::to_string(prizeDurationLimit - currentPrizeDuration), olc::DARK_YELLOW);
+
+
 		return true;
 	}
 };
