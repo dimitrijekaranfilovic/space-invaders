@@ -20,7 +20,6 @@ struct Prize
 	int kind;
 	float px;
 	float py;
-	float speed;
 	bool collected = false;
 };
 
@@ -29,27 +28,21 @@ struct Ship
 	float px = 150.0f;
 	float py = 350.0f;
 	float speed = 2.0f;
-	int w = 10;
-	int h = 10;
 	bool indestructible = false;
 };
 
 struct Bullet
 {
 	float px, py;
-	int w, h;
-	int speed;
 	bool used = false;
-	Bullet(float x, float y, int width, int height, int s) : px(x), py(y), w(width), h(height), speed(s) {}
+	Bullet(float x, float y) : px(x), py(y){}
 };
 
 struct Obstacle
 {
 	float px, py;
-	int w, h;
-	float speed;
 	bool destroyed = false;
-	Obstacle(float x, float y, int width, int height, float s) : px(x), py(y), w(width), h(height), speed(s) {}
+	Obstacle(float x, float y) : px(x), py(y){}
 };
 
 
@@ -93,7 +86,7 @@ public:
 		shipSprite.LoadFromFile("../resources/spaceship2.png");
 		bulletSprite.LoadFromFile("../resources/bullet1.png");
 		meteorSprite.LoadFromFile("../resources/meteor4.png");
-		speedSprite.LoadFromFile("../resources/speed1.png");
+		speedSprite.LoadFromFile("../resources/speed3.png");
 		doublePointSprite.LoadFromFile("../resources/two1.png");
 		indestructibleSprite.LoadFromFile("../resources/strength1.png");
 		SetPixelMode(olc::Pixel::MASK);
@@ -110,13 +103,13 @@ public:
 
 		if (GetKey(olc::Key::SPACE).bPressed)
 		{
-			Bullet b((ship.px + bulletSprite.width / 2), ship.py, bulletSprite.width, bulletSprite.height, bulletSpeed);
+			Bullet b((ship.px + bulletSprite.width / 2), ship.py);
 			bullets.push_back(b);
 		}
 
 		//update bullets' positions
 		for (int i = 0; i < bullets.size(); i++)
-			bullets[i].py -= bullets[i].speed;
+			bullets[i].py -= bulletSpeed;
 
 		//add obstacles
 		timePassed += fElapsedTime;
@@ -124,7 +117,7 @@ public:
 		{
 			for (int i = 0; i < numObstacles; ++i)
 			{
-				Obstacle o(rand() % ScreenWidth(), quotient * i, meteorSprite.width, meteorSprite.height, obstacleSpeed);
+				Obstacle o(rand() % ScreenWidth(), quotient * i);
 				obstacles.push_back(o);
 			}
 			timePassed = 0.0f;
@@ -139,7 +132,7 @@ public:
 		//update obstacles' positions
 		for (int i = 0; i < obstacles.size(); ++i)
 		{
-			if (squareSquareCollision(ship.px, ship.py, obstacles[i].px, obstacles[i].py, ship.w, meteorSprite.width) && !ship.indestructible)
+			if (squareSquareCollision(ship.px, ship.py, obstacles[i].px, obstacles[i].py, shipSprite.width, meteorSprite.width) && !ship.indestructible)
 			{
 				std::cout << "GAME OVER!\n" << "Your score was: " << score << std::endl;
 				std::this_thread::sleep_for(std::chrono::milliseconds(2000));
@@ -147,7 +140,7 @@ public:
 			}
 			else
 			{
-				obstacles[i].py += obstacles[i].speed;
+				obstacles[i].py += obstacleSpeed;
 			}
 		}
 
@@ -169,7 +162,7 @@ public:
 		//check if any of the prizes was collected and apply its effects
 		for (int i = 0; i < prizes.size(); ++i)
 		{
-			if (squareSquareCollision(ship.px, ship.py, prizes[i].px, prizes[i].py, ship.w, speedSprite.width))
+			if (squareSquareCollision(ship.px, ship.py, prizes[i].px, prizes[i].py, shipSprite.width, speedSprite.width))
 			{
 				prizes[i].collected = true;
 				countPrize = true;
@@ -194,7 +187,7 @@ public:
 		{
 			for (int j = 0; j < bullets.size(); ++j)
 			{
-				if (squareSquareCollision(obstacles[i].px, obstacles[i].py, bullets[j].px, bullets[j].py, obstacles[i].w, bullets[j].w))
+				if (squareSquareCollision(obstacles[i].px, obstacles[i].py, bullets[j].px, bullets[j].py, meteorSprite.width, bulletSprite.width))
 				{
 					obstacles[i].destroyed = true;
 					bullets[j].used = true;
@@ -222,13 +215,13 @@ public:
 			p.px = rand() % ScreenWidth();
 			p.py = 0;
 			p.kind = rand() % 3;
-			p.speed = prizeSpeed;
+			//p.speed = prizeSpeed;
 			prizes.push_back(p);
 		}
 
 		//update prizes' position
 		for (int i = 0; i < prizes.size(); ++i)
-			prizes[i].py += prizes[i].speed;
+			prizes[i].py += prizeSpeed;
 
 		//remove bullets that went out of bounds or have destroyed an obstacle
 		bullets.erase(std::remove_if(bullets.begin(), bullets.end(), [](const Bullet& b) {return b.used || b.py < 0; }), bullets.end());
@@ -245,7 +238,6 @@ public:
 		//draw ship
 		DrawSprite(ship.px, ship.py, &shipSprite);
 
-
 		//draw bullets
 		for (int i = 0; i < bullets.size(); ++i)
 			DrawSprite(bullets[i].px, bullets[i].py, &bulletSprite);
@@ -253,7 +245,6 @@ public:
 		//draw obstacles
 		for (int i = 0; i < obstacles.size(); ++i)
 			DrawSprite(obstacles[i].px, obstacles[i].py, &meteorSprite);
-
 
 		//draw prizes
 		for (int i = 0; i < prizes.size(); ++i)
@@ -271,7 +262,6 @@ public:
 		//display score
 		DrawString(0, 0, "Score: " + std::to_string(score), olc::DARK_YELLOW);
 
-
 		return true;
 	}
 };
@@ -280,8 +270,5 @@ int main()
 	Example demo;
 	if (demo.Construct(400, SCREEN_HEIGHT, 2, 2))
 		demo.Start();
-
-
-
 	return 0;
 }
