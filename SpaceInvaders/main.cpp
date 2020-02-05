@@ -6,11 +6,7 @@
 #include <chrono>
 #include <thread>
 #define SCREEN_HEIGHT 400
-/*TODO: stavi nagrade:
-1.dva metka istovremeno
-2.brze kretanje
-3.neunistivost
-*/
+
 bool squareSquareCollision(float x1, float y1, float x2, float y2, int w1, int w2)
 {
 	if (x1 + w1 > x2 && x2 + w2 > x1 && y1 + w1 > y2 && y2 + w2 > y1)
@@ -18,10 +14,9 @@ bool squareSquareCollision(float x1, float y1, float x2, float y2, int w1, int w
 	return false;
 }
 
-
 struct Prize
 {
-	enum Kind { SPEED = 0, DOUBLE_POINT = 1, INDESTRUCTIBLE = 2};
+	enum Kind { SPEED = 0, DOUBLE_POINT = 1, INDESTRUCTIBLE = 2 };
 	int kind;
 	float px;
 	float py;
@@ -37,8 +32,6 @@ struct Ship
 	int w = 10;
 	int h = 10;
 	bool indestructible = false;
-	//float speedQuotient = 1.0f;
-
 };
 
 struct Bullet
@@ -89,7 +82,7 @@ public:
 	std::vector<Bullet> bullets;
 	std::vector<Obstacle> obstacles;
 	std::vector<Prize> prizes;
-	
+
 	Example()
 	{
 		sAppName = "Space invaders";
@@ -143,7 +136,6 @@ public:
 		if (obstacles.size() <= 3)
 			quotient = -100;
 
-
 		//update obstacles' positions
 		for (int i = 0; i < obstacles.size(); ++i)
 		{
@@ -159,7 +151,6 @@ public:
 			}
 		}
 
-
 		//count the time untill prize's effects wear off
 		if (countPrize)
 		{
@@ -174,12 +165,10 @@ public:
 				ship.speed = 2.0f;
 			}
 		}
-			
 
 		//check if any of the prizes was collected and apply its effects
-		for(int i = 0; i < prizes.size();++i)
+		for (int i = 0; i < prizes.size(); ++i)
 		{
-			
 			if (squareSquareCollision(ship.px, ship.py, prizes[i].px, prizes[i].py, ship.w, speedSprite.width))
 			{
 				prizes[i].collected = true;
@@ -200,7 +189,6 @@ public:
 				}
 			}
 		}
-		std::cout << currentPrizeDuration << std::endl;
 		//check if any of the obstacles were destroyed and update parameters
 		for (int i = 0; i < obstacles.size(); ++i)
 		{
@@ -265,7 +253,7 @@ public:
 		//draw obstacles
 		for (int i = 0; i < obstacles.size(); ++i)
 			DrawSprite(obstacles[i].px, obstacles[i].py, &meteorSprite);
-		
+
 
 		//draw prizes
 		for (int i = 0; i < prizes.size(); ++i)
@@ -292,8 +280,8 @@ int main()
 	Example demo;
 	if (demo.Construct(400, SCREEN_HEIGHT, 2, 2))
 		demo.Start();
-		
-	
+
+
 
 	return 0;
 }
