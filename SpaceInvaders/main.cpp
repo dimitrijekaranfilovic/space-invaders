@@ -82,7 +82,7 @@ public:
 			ship.px += 2;
 		if (GetKey(olc::Key::SPACE).bPressed)
 		{
-			Bullet b((ship.px + ship.w / 2), ship.py, bulletSprite.width, bulletSprite.height, 3);
+			Bullet b((ship.px + bulletSprite.width / 2), ship.py, bulletSprite.width, bulletSprite.height, 3);
 			bullets.push_back(b);
 		}
 
