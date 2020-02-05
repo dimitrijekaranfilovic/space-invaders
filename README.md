@@ -4,4 +4,4 @@ Legendary game written using C++ and olcPixelGameEngine. Shoutout to javidx9.
 You can move left using left arrow key or A, and you can move right using right arrow key or D.
 With space you shoot. If you collide with any of the obstacles, game over.
 
-![picture](resources/image.png)
+![picture](resources/screenshot1.png)
