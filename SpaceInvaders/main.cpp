@@ -145,7 +145,7 @@ public:
 		//update obstacles' positions
 		for (int i = 0; i < obstacles.size(); ++i)
 		{
-			if (squareSquareCollision(ship.px, ship.py, obstacles[i].px, obstacles[i].py, ship.w, obstacles[i].w))
+			if (squareSquareCollision(ship.px, ship.py, obstacles[i].px, obstacles[i].py, ship.w, obstacles[i].w) && !ship.indestructible)
 			{
 				std::cout << "GAME OVER!\n" << "Your score was: " << score << std::endl;
 				std::this_thread::sleep_for(std::chrono::milliseconds(2000));
@@ -157,10 +157,7 @@ public:
 			}
 		}
 
-		
-
-
-		//check if any of the obstacles was destroyed and update parameters
+		//check if any of the obstacles were destroyed and update parameters
 		for (int i = 0; i < obstacles.size(); ++i)
 		{
 			for (int j = 0; j < bullets.size(); ++j)
