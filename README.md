@@ -1,9 +1,12 @@
 # space-invaders
 Legendary game written using C++ and olcPixelGameEngine. Shoutout to javidx9.
 ## Controls and rules
-You can move left using left arrow key or A, and you can move right using right arrow key or D.
-With space you shoot. If you collide with any of the obstacles, game over.
-                                  
+
+<kbd>Left arrow</kbd> or <kbd>A</kbd> to go left
+<kbd>Right arrow</kbd> or <kbd>D</kbd> to go right
+<kbd>Space</kbd> to shoot
+
+                   
 ![picture](resources/meteor4.png)   an obstacle which you either avoid or destroy and win a point
 
 ![picture](resources/speed3.png)    a prize which grants you 3x the speed for 3 seconds
