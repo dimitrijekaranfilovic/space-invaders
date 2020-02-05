@@ -41,22 +41,15 @@ struct Obstacle
 	Obstacle(float x, float y, int width, int height, int s) : px(x), py(y), w(width), h(height), speed(s){}
 };
 
- 
-bool obstacleRemovable(const Obstacle& o)
-{
-	return o.py > SCREEN_HEIGHT || o.destroyed;
-}
 
-
-bool bulletRemovable(const Bullet& b)
-{
-	return b.py < 0 || b.used;
-}
 
 class Example : public olc::PixelGameEngine
 {
 
 public:
+	olc::Sprite shipSprite;
+	olc::Sprite bulletSprite;
+	olc::Sprite meteorSprite;
 	Ship ship;
 	int score;
 	float timePassed;
@@ -74,18 +67,22 @@ public:
 		ship.w = 10;
 		ship.h = 10;
 		timePassed = 0;
+		shipSprite.LoadFromFile("../resources/spaceship2.png");
+		bulletSprite.LoadFromFile("../resources/bullet1.png");
+		meteorSprite.LoadFromFile("../resources/meteor4.png");
+		SetPixelMode(olc::Pixel::MASK);
 
 		return true;
 	}
 	bool OnUserUpdate(float fElapsedTime) override
 	{
-		if (GetKey(olc::Key::LEFT).bHeld || GetKey(olc::Key::A).bHeld)
+		if (GetKey(olc::Key::LEFT).bHeld || GetKey(olc::Key::A).bHeld && ship.px > 0)
 			ship.px -= 2;
 		if (GetKey(olc::Key::RIGHT).bHeld || GetKey(olc::Key::D).bHeld)
 			ship.px += 2;
 		if (GetKey(olc::Key::SPACE).bPressed)
 		{
-			Bullet b(ship.px, ship.py, 5, 5, 3);
+			Bullet b((ship.px + ship.w / 2), ship.py, bulletSprite.width, bulletSprite.height, 3);
 			bullets.push_back(b);
 		}
 
@@ -99,7 +96,7 @@ public:
 		if (score < 5 && timePassed > 5)
 		{
 			//std::cout << "Proslo 5 sekundi." << std::endl;
-			Obstacle o(rand() % ScreenWidth(), 0, 8, 8, 1);
+			Obstacle o(rand() % ScreenWidth(), 0, meteorSprite.width, meteorSprite.height, 1);
 			obstacles.push_back(o);
 			timePassed = 0.0f;
 		}
@@ -108,7 +105,7 @@ public:
 			//std::cout << "Proslo 4 sekunde." << std::endl;
 			for (int i = 0; i < 2; ++i)
 			{
-				Obstacle o(rand() % ScreenWidth(), -100 * i, 8, 8, 2);
+				Obstacle o(rand() % ScreenWidth(), -100 * i, meteorSprite.width, meteorSprite.height, 2);
 				obstacles.push_back(o);
 			}
 			timePassed = 0.0f;
@@ -117,7 +114,7 @@ public:
 		{
 			for (int i = 0; i < 3; ++i)
 			{
-				Obstacle o(rand() % ScreenWidth(), -100 * i, 8, 8, 3);
+				Obstacle o(rand() % ScreenWidth(), -100 * i, meteorSprite.width, meteorSprite.height, 3);
 				obstacles.push_back(o);
 			}
 			
@@ -128,7 +125,7 @@ public:
 		{
 			for (int i = 0; i < 4; ++i)
 			{
-				Obstacle o(rand() % ScreenWidth(), -200 * i, 8, 8, 4);
+				Obstacle o(rand() % ScreenWidth(), -200 * i, meteorSprite.width, meteorSprite.height, 4);
 				obstacles.push_back(o);
 			}
 			timePassed = 0.0f;
@@ -165,37 +162,33 @@ public:
 		}
 
 		//remove bullets that went out of bounds
-		bullets.erase(std::remove_if(bullets.begin(), bullets.end(), bulletRemovable), bullets.end());
+		bullets.erase(std::remove_if(bullets.begin(), bullets.end(), [](const Bullet& b) {return b.used || b.py < 0; }), bullets.end());
 
 		//remove obstacles that went out of bounds
-		obstacles.erase(std::remove_if(obstacles.begin(), obstacles.end(), obstacleRemovable), obstacles.end());
+		obstacles.erase(std::remove_if(obstacles.begin(), obstacles.end(), [](const Obstacle& o) {return o.destroyed || o.py > SCREEN_HEIGHT; }), obstacles.end());
 			
 		//clear screen	
 		FillRect(0, 0, ScreenWidth(), ScreenHeight(), olc::BLACK);
 		
 		//draw ship
-		DrawRect(ship.px, ship.py, ship.w, ship.h, olc::DARK_CYAN);
-		FillRect(ship.px, ship.py, ship.w, ship.h, olc::DARK_CYAN);
+		DrawSprite(ship.px, ship.py, &shipSprite);
 		
 
 		//draw bullets
 		for (int i = 0; i < bullets.size(); ++i)
 		{
-			DrawRect(bullets[i].px, bullets[i].py, bullets[i].w, bullets[i].h, olc::DARK_GREY);
-			FillRect(bullets[i].px, bullets[i].py, bullets[i].w, bullets[i].h, olc::DARK_GREY);
+			DrawSprite(bullets[i].px, bullets[i].py, &bulletSprite);
 		}
 
 		//draw obstacles
 		for (int i = 0; i < obstacles.size(); ++i)
 		{
-			DrawRect(obstacles[i].px, obstacles[i].py, obstacles[i].w, obstacles[i].h, olc::RED);
-			FillRect(obstacles[i].px, obstacles[i].py, obstacles[i].w, obstacles[i].h, olc::RED);
+			DrawSprite(obstacles[i].px, obstacles[i].py, &meteorSprite);
 		}
 
 		//display score
 		DrawString(0, 0, "Score: " + std::to_string(score), olc::DARK_YELLOW);
 			
-
 		return true;
 	}
 };
