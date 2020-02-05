@@ -2,9 +2,9 @@
 Legendary game written using C++ and olcPixelGameEngine. Shoutout to javidx9.
 ## Controls and rules
 
-<kbd>Left arrow</kbd> or <kbd>A</kbd> to go left
+<kbd>&leftarrow;</kbd> or <kbd>A</kbd> to go left
 
-<kbd>Right arrow</kbd> or <kbd>D</kbd> to go right
+<kbd>&rightarrow;</kbd> or <kbd>D</kbd> to go right
 
 <kbd>Space</kbd> to shoot
 
