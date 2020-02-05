@@ -7,7 +7,7 @@
 #include <thread>
 #define SCREEN_HEIGHT 400
 
-
+//TODO: popravi pojavljivanje neprijatelja da se teorijski moze igrati beskonacno
 bool squareSquareCollision(float x1, float y1, float x2, float y2, int w1, int w2)
 {
 	if (x1 + w1 > x2 && x2 + w2 > x1 && y1 + w1 > y2 && y2 + w2 > y1)
@@ -52,7 +52,14 @@ public:
 	olc::Sprite meteorSprite;
 	Ship ship;
 	int score;
+	int timeBound;
+	int numObstacles;
+	int scoreLowerBound;
+	int scoreUpperBound;
+	int quotient;
+	float obstacleSpeed;
 	float timePassed;
+	bool increased = false;
 	std::vector<Bullet> bullets;
 	std::vector<Obstacle> obstacles;
 	Example()
@@ -71,7 +78,13 @@ public:
 		bulletSprite.LoadFromFile("../resources/bullet1.png");
 		meteorSprite.LoadFromFile("../resources/meteor4.png");
 		SetPixelMode(olc::Pixel::MASK);
-
+		obstacleSpeed = 0.5f;
+		score = 0;
+		scoreLowerBound = 0;
+		scoreUpperBound = 5;
+		timeBound = 5;
+		numObstacles = 1;
+		quotient = -100;
 		return true;
 	}
 	bool OnUserUpdate(float fElapsedTime) override
@@ -84,7 +97,7 @@ public:
 		if ((GetKey(olc::Key::RIGHT).bHeld || GetKey(olc::Key::D).bHeld) && ship.px < ScreenWidth() - shipSprite.width)
 		{
 			ship.px += 2;
-			std::cout << ship.px << std::endl;
+			//std::cout << ship.px << std::endl;
 		}
 			
 		if (GetKey(olc::Key::SPACE).bPressed)
@@ -97,47 +110,24 @@ public:
 		for (int i = 0; i < bullets.size(); i++)
 			bullets[i].py -= bullets[i].speed;
 			
-		
 		//add obstacles
 		timePassed += fElapsedTime;
-		if (score < 5 && timePassed > 5)
+		std::cout << score << ", " << scoreLowerBound << ", " << scoreUpperBound << ", " << timeBound << std::endl;
+		if ((score >= scoreLowerBound) && (score < scoreUpperBound) && (timePassed > timeBound))
 		{
-			//std::cout << "Proslo 5 sekundi." << std::endl;
-			Obstacle o(rand() % ScreenWidth(), 0, meteorSprite.width, meteorSprite.height, 0.5);
-			obstacles.push_back(o);
-			timePassed = 0.0f;
-		}
-		else if (score >= 5 && score < 10 && timePassed > 4)
-		{
-			//std::cout << "Proslo 4 sekunde." << std::endl;
-			for (int i = 0; i < 2; ++i)
+			for (int i = 0; i < numObstacles; ++i)
 			{
-				Obstacle o(rand() % ScreenWidth(), -100 * i, meteorSprite.width, meteorSprite.height, 1.25);
-				obstacles.push_back(o);
-			}
-			timePassed = 0.0f;
-		}
-		else if (score >= 10 && score < 15 && timePassed > 3)
-		{
-			for (int i = 0; i < 3; ++i)
-			{
-				Obstacle o(rand() % ScreenWidth(), -100 * i, meteorSprite.width, meteorSprite.height, 2.0f);
-				obstacles.push_back(o);
-			}
-			
-			timePassed = 0.0f;
-		}
-
-		else if (score >= 15 && score < 20 && timePassed > 2)
-		{
-			for (int i = 0; i < 4; ++i)
-			{
-				Obstacle o(rand() % ScreenWidth(), -200 * i, meteorSprite.width, meteorSprite.height, 2.75f);
+				Obstacle o(rand() % ScreenWidth(), quotient * i, meteorSprite.width, meteorSprite.height, obstacleSpeed);
 				obstacles.push_back(o);
 			}
 			timePassed = 0.0f;
 		}
 
+		//correct distance between obstacles
+		if (obstacles.size() > 3)
+			quotient *= 2.0;
+		if (obstacles.size() <= 3)
+			quotient = -100;
 
 
 		//update obstacles' positions
@@ -155,6 +145,7 @@ public:
 			}
 		}
 
+		//check if any of the obstacles was destroyed and update parameters
 		for (int i = 0; i < obstacles.size(); ++i)
 		{
 			for (int j = 0; j < bullets.size(); ++j)
@@ -164,6 +155,17 @@ public:
 					obstacles[i].destroyed = true;
 					bullets[j].used = true;
 					score += 1;
+					if (score % 5 == 0)
+					{
+						numObstacles += 1;
+						if(timeBound > 1)
+							timeBound -= 1;
+						if (timeBound < 0)
+							timeBound = 1;
+						scoreLowerBound += 5;
+						scoreUpperBound += 5;
+						obstacleSpeed *= 1.25f;
+					}
 				}
 			}
 		}
