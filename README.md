@@ -17,4 +17,8 @@ Legendary game written using C++ and olcPixelGameEngine. Shoutout to javidx9.
 
 ![picture](resources/two1.png)      a prize which which lasts for 3 seconds and makes each point count as 2
 
+![picture](resources/spaceship2.png)  you
+
+![picture](resources/bullet1.png)  bullet that you fire
+
 ![picture](resources/screenshot1.png)
