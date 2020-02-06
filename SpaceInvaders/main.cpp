@@ -108,7 +108,7 @@ public:
 		}
 
 		//update bullets' positions
-		for (int i = 0; i < bullets.size(); i++)
+		for (unsigned int i = 0; i < bullets.size(); i++)
 			bullets[i].py -= bulletSpeed;
 
 		//add obstacles
@@ -117,7 +117,7 @@ public:
 		{
 			for (int i = 0; i < numObstacles; ++i)
 			{
-				Obstacle o(rand() % ScreenWidth(), quotient * i);
+				Obstacle o(rand() % ScreenWidth(), quotient * i * 1.0f);
 				obstacles.push_back(o);
 			}
 			timePassed = 0.0f;
@@ -125,12 +125,12 @@ public:
 
 		//correct distance between obstacles
 		if (obstacles.size() > 3)
-			quotient *= 2.0;
+			quotient *= 2;
 		if (obstacles.size() <= 3)
 			quotient = -100;
 
 		//update obstacles' positions
-		for (int i = 0; i < obstacles.size(); ++i)
+		for (unsigned int i = 0; i < obstacles.size(); ++i)
 		{
 			if (squareSquareCollision(ship.px, ship.py, obstacles[i].px, obstacles[i].py, shipSprite.width, meteorSprite.width) && !ship.indestructible)
 			{
@@ -160,7 +160,7 @@ public:
 		}
 
 		//check if any of the prizes was collected and apply its effects
-		for (int i = 0; i < prizes.size(); ++i)
+		for (unsigned int i = 0; i < prizes.size(); ++i)
 		{
 			if (squareSquareCollision(ship.px, ship.py, prizes[i].px, prizes[i].py, shipSprite.width, speedSprite.width))
 			{
@@ -183,9 +183,9 @@ public:
 			}
 		}
 		//check if any of the obstacles were destroyed and update parameters
-		for (int i = 0; i < obstacles.size(); ++i)
+		for (unsigned int i = 0; i < obstacles.size(); ++i)
 		{
-			for (int j = 0; j < bullets.size(); ++j)
+			for (unsigned int j = 0; j < bullets.size(); ++j)
 			{
 				if (squareSquareCollision(obstacles[i].px, obstacles[i].py, bullets[j].px, bullets[j].py, meteorSprite.width, bulletSprite.width))
 				{
@@ -220,7 +220,7 @@ public:
 		}
 
 		//update prizes' position
-		for (int i = 0; i < prizes.size(); ++i)
+		for (unsigned int i = 0; i < prizes.size(); ++i)
 			prizes[i].py += prizeSpeed;
 
 		//remove bullets that went out of bounds or have destroyed an obstacle
@@ -239,15 +239,15 @@ public:
 		DrawSprite(ship.px, ship.py, &shipSprite);
 
 		//draw bullets
-		for (int i = 0; i < bullets.size(); ++i)
+		for (unsigned int i = 0; i < bullets.size(); ++i)
 			DrawSprite(bullets[i].px, bullets[i].py, &bulletSprite);
 
 		//draw obstacles
-		for (int i = 0; i < obstacles.size(); ++i)
+		for (unsigned int i = 0; i < obstacles.size(); ++i)
 			DrawSprite(obstacles[i].px, obstacles[i].py, &meteorSprite);
 
 		//draw prizes
-		for (int i = 0; i < prizes.size(); ++i)
+		for (unsigned int i = 0; i < prizes.size(); ++i)
 		{
 			olc::Sprite* pointer = nullptr;
 			if (prizes[i].kind == Prize::SPEED)
