@@ -58,7 +58,7 @@ public:
 	olc::Sprite speedSprite;
 	olc::Sprite doublePointSprite;
 	Ship ship;
-	int prizeDurationLimit = 3;
+	int prizeDurationLimit = 5;
 	float currentPrizeDuration = 0;
 	int pointCount = 1;
 	int score = 0;
