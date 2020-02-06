@@ -8,7 +8,7 @@ Legendary game written using C++ and olcPixelGameEngine. Shoutout to javidx9.
 
 <kbd>Space</kbd> to shoot
 
-#### Prizes
+### Prizes
 
 ![picture](resources/speed3.png)    a prize which grants you 3x the speed
 
@@ -16,9 +16,9 @@ Legendary game written using C++ and olcPixelGameEngine. Shoutout to javidx9.
 
 ![picture](resources/two1.png)      a prize which which makes each point count as 2
 
-#####     Each prize lasts for 5 seconds.
+**Remark: Each prize lasts for 5 seconds.**
 
-#### Other objects
+### Other objects
 
 ![picture](resources/meteor4.png)   an obstacle which you either avoid or destroy and win a point
 
