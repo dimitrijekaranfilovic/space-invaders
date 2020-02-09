@@ -154,10 +154,10 @@ public:
 		}
 
 		//correct distance between obstacles
-		//if (obstacles.size() > 3)
-			quotient *= (numObstacles);
-		//if (obstacles.size() <= 3)
-		//	quotient = -100;
+		if (obstacles.size() > 3)
+			quotient *= 2;
+		if (obstacles.size() <= 3)
+			quotient = -100;
 
 		//update obstacles' positions
 		for (unsigned int i = 0; i < obstacles.size(); ++i)
