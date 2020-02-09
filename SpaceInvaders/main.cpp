@@ -60,7 +60,6 @@ public:
 	olc::Sprite doublePointSprite;
 	Ship ship;
 	int prizeDurationLimit = 5;
-	float currentPrizeDuration = 0;
 	int pointCount = 1;
 	int score = 0;
 	int timeBound = 5;
@@ -72,11 +71,11 @@ public:
 	float timePassed = 0;
 	int bulletSpeed = 3;
 	float prizeSpeed = 0.8f;
-	bool countPrize = false;
 	std::vector<Bullet> bullets;
 	std::vector<Obstacle> obstacles;
 	std::vector<Prize> prizes;
 	std::unordered_map<int, float> prizeDurationMap;
+	bool gameOver = false;
 
 	Example()
 	{
@@ -100,22 +99,45 @@ public:
 	}
 	bool OnUserUpdate(float fElapsedTime) override
 	{
-		if ((GetKey(olc::Key::LEFT).bHeld || GetKey(olc::Key::A).bHeld) && ship.px > 0)
+		if ((GetKey(olc::Key::LEFT).bHeld || GetKey(olc::Key::A).bHeld) && ship.px > 0 && !gameOver)
 			ship.px -= ship.speed;
 
-		if ((GetKey(olc::Key::RIGHT).bHeld || GetKey(olc::Key::D).bHeld) && ship.px < ScreenWidth() - shipSprite.width)
+		if ((GetKey(olc::Key::RIGHT).bHeld || GetKey(olc::Key::D).bHeld) && (ship.px < ScreenWidth() - shipSprite.width) && !gameOver)
 			ship.px += ship.speed;
 
 
-		if (GetKey(olc::Key::SPACE).bPressed)
+		if (GetKey(olc::Key::SPACE).bPressed && !gameOver)
 		{
 			Bullet b(ship.px, ship.py);
 			bullets.push_back(b);
 		}
+		//start a new game
+		if (gameOver && GetKey(olc::Key::ENTER).bPressed)
+		{
+			obstacles.clear();
+			bullets.clear();
+			prizes.clear();
+			scoreLowerBound = 0;
+			scoreUpperBound = 5;
+			numObstacles = 1;
+			score = 0;
+			timeBound = 5;
+			gameOver = false;
+			pointCount = 1;
+			ship.speed = 2.0f;
+			obstacleSpeed = 0.5f;
+			ship.indestructible = false;
+			ship.px = 150.0f;
+			ship.py = 350.0f;
+		}
 
 		//update bullets' positions
 		for (unsigned int i = 0; i < bullets.size(); i++)
-			bullets[i].py -= bulletSpeed;
+		{
+			if(!gameOver)
+				bullets[i].py -= bulletSpeed;
+		}
+			
 
 		//add obstacles
 		timePassed += fElapsedTime;
@@ -123,8 +145,11 @@ public:
 		{
 			for (int i = 0; i < numObstacles; ++i)
 			{
-				Obstacle o(rand() % ScreenWidth(), quotient * i * 1.0f);
-				obstacles.push_back(o);
+				if (!gameOver) 
+				{
+					Obstacle o(rand() % ScreenWidth(), quotient * i * 1.0f);
+					obstacles.push_back(o);
+				}
 			}
 			timePassed = 0.0f;
 		}
@@ -140,13 +165,12 @@ public:
 		{
 			if (squareSquareCollision(ship.px, ship.py, obstacles[i].px, obstacles[i].py, shipSprite.width - 5, meteorSprite.width - 5) && !ship.indestructible)
 			{
-				std::cout << "GAME OVER!\n" << "Your score was: " << score << std::endl;
-				std::this_thread::sleep_for(std::chrono::milliseconds(2000));
-				exit(0);
+				gameOver = true;
 			}
 			else
 			{
-				obstacles[i].py += obstacleSpeed;
+				if(!gameOver)
+					obstacles[i].py += obstacleSpeed;
 			}
 		}
 
@@ -188,7 +212,6 @@ public:
 			if (squareSquareCollision(ship.px, ship.py, prizes[i].px, prizes[i].py, shipSprite.width, speedSprite.width))
 			{
 				prizes[i].collected = true;
-				countPrize = true;
 				switch (prizes[i].kind)
 				{
 				case Prize::DOUBLE_POINT:
@@ -246,7 +269,11 @@ public:
 
 		//update prizes' position
 		for (unsigned int i = 0; i < prizes.size(); ++i)
-			prizes[i].py += prizeSpeed;
+		{
+			if(!gameOver)
+				prizes[i].py += prizeSpeed;
+		}
+			
 
 		//remove bullets that went out of bounds or have destroyed an obstacle
 		bullets.erase(std::remove_if(bullets.begin(), bullets.end(), [](const Bullet& b) {return b.used || b.py < 0; }), bullets.end());
@@ -307,6 +334,13 @@ public:
 			DrawString(100, y, "Speed boost time remaining: " + std::to_string(prizeDurationMap[Prize::SPEED]), olc::DARK_YELLOW);
 		}
 
+		if (gameOver)
+		{
+			DrawString(ScreenWidth() / 2 - 50, ScreenHeight() / 2, "GAME OVER!", olc::DARK_RED, 3);
+			//std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+			//exit(0);
+
+		}
 
 		return true;
 	}
@@ -316,9 +350,5 @@ int main()
 	Example demo;
 	if (demo.Construct(400, SCREEN_HEIGHT, 2, 2))
 		demo.Start();
-	//std::unordered_map<int, float> mapa;
-	//mapa[1] = 1.1f;
-	//mapa[2] = 2.2f;
-	//std::cout << mapa[1] << std::endl;
 	return 0;
 }
