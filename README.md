@@ -14,7 +14,7 @@ Legendary game written using C++ and olcPixelGameEngine. Shoutout to javidx9.
 
 ![picture](resources/strength9.png) a prize which grants you indestructability(collision with meteor doesn't mean game over)
 
-![picture](resources/two3.png)      a prize which which makes each point count as 2
+![picture](resources/two5.png)      a prize which which makes each point count as 2
 
 **Remark: Each prize lasts for 5 seconds.**
 
