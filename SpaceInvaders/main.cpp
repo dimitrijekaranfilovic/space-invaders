@@ -5,6 +5,7 @@
 #include <iostream>
 #include <chrono>
 #include <thread>
+#include <unordered_map> 
 #define SCREEN_HEIGHT 400
 
 bool squareSquareCollision(float x1, float y1, float x2, float y2, int w1, int w2)
@@ -75,6 +76,7 @@ public:
 	std::vector<Bullet> bullets;
 	std::vector<Obstacle> obstacles;
 	std::vector<Prize> prizes;
+	std::unordered_map<int, float> prizeDurationMap;
 
 	Example()
 	{
@@ -91,6 +93,9 @@ public:
 		doublePointSprite.LoadFromFile("../resources/two5.png"); 
 		indestructibleSprite.LoadFromFile("../resources/strength9.png"); 
 		SetPixelMode(olc::Pixel::MASK);
+		prizeDurationMap[Prize::SPEED] = 0.0f;
+		prizeDurationMap[Prize::INDESTRUCTIBLE] = 0.0f;
+		prizeDurationMap[Prize::DOUBLE_POINT] = 0.0f;
 		return true;
 	}
 	bool OnUserUpdate(float fElapsedTime) override
@@ -133,7 +138,7 @@ public:
 		//update obstacles' positions
 		for (unsigned int i = 0; i < obstacles.size(); ++i)
 		{
-			if (squareSquareCollision(ship.px, ship.py, obstacles[i].px, obstacles[i].py, shipSprite.width-5, meteorSprite.width-5) && !ship.indestructible)
+			if (squareSquareCollision(ship.px, ship.py, obstacles[i].px, obstacles[i].py, shipSprite.width - 5, meteorSprite.width - 5) && !ship.indestructible)
 			{
 				std::cout << "GAME OVER!\n" << "Your score was: " << score << std::endl;
 				std::this_thread::sleep_for(std::chrono::milliseconds(2000));
@@ -145,20 +150,37 @@ public:
 			}
 		}
 
-		//count the time untill prize's effects wear off
-		if (countPrize)
+		
+		//see if prizes' effects have worn off
+		if (prizeDurationMap[Prize::SPEED] <= 0.0f)
 		{
-			currentPrizeDuration += fElapsedTime;
-			if (currentPrizeDuration > prizeDurationLimit)
-			{
-				//reset parameters
-				countPrize = false;
-				currentPrizeDuration = 0;
-				pointCount = 1;
-				ship.indestructible = false;
-				ship.speed = 2.0f;
-			}
+			prizeDurationMap[Prize::SPEED] = 0.0f;
+			ship.speed = 2.0f;
 		}
+		else
+			prizeDurationMap[Prize::SPEED] = prizeDurationMap[Prize::SPEED] - fElapsedTime;
+
+
+		if (prizeDurationMap[Prize::DOUBLE_POINT] <= 0.0f)
+		{
+			prizeDurationMap[Prize::DOUBLE_POINT] = 0.0f;
+			pointCount = 1;
+		}
+		else
+			prizeDurationMap[Prize::DOUBLE_POINT] = prizeDurationMap[Prize::DOUBLE_POINT] - fElapsedTime;
+
+
+
+		if (prizeDurationMap[Prize::INDESTRUCTIBLE] <= 0.0f)
+		{
+			prizeDurationMap[Prize::INDESTRUCTIBLE] = 0.0f;
+			ship.indestructible = false;
+		}
+			
+		else
+			prizeDurationMap[Prize::INDESTRUCTIBLE] = prizeDurationMap[Prize::INDESTRUCTIBLE] - fElapsedTime;
+		
+
 
 		//check if any of the prizes was collected and apply its effects
 		for (unsigned int i = 0; i < prizes.size(); ++i)
@@ -171,12 +193,15 @@ public:
 				{
 				case Prize::DOUBLE_POINT:
 					pointCount = 2;
+					prizeDurationMap[Prize::DOUBLE_POINT] = prizeDurationMap[Prize::DOUBLE_POINT] + prizeDurationLimit;
 					break;
 				case Prize::INDESTRUCTIBLE:
 					ship.indestructible = true;
+					prizeDurationMap[Prize::INDESTRUCTIBLE] = prizeDurationMap[Prize::INDESTRUCTIBLE] + prizeDurationLimit;
 					break;
 				case Prize::SPEED:
 					ship.speed = 6.0f;
+					prizeDurationMap[Prize::SPEED] = prizeDurationMap[Prize::SPEED] + prizeDurationLimit;
 					break;
 				default:
 					break;
@@ -210,13 +235,12 @@ public:
 
 		//add prizes
 		int n = rand() % 5500;
-		if (n < 3)
+		if (n < 300) //n < 3
 		{
 			Prize p;
 			p.px = rand() % ScreenWidth();
 			p.py = 0;
 			p.kind = rand() % 3;
-			//p.speed = prizeSpeed;
 			prizes.push_back(p);
 		}
 
@@ -264,22 +288,23 @@ public:
 		DrawString(0, 0, "Score: " + std::to_string(score), olc::DARK_YELLOW);
 
 		int y = 0;
+		
 		//prize time remaining
 		if (ship.indestructible)
 		{
-			DrawString(100, y, "Indestructible time remaining: " + std::to_string(prizeDurationLimit - currentPrizeDuration), olc::DARK_YELLOW);
-			y += 30;
+			DrawString(100, y, "Indestructible time remaining: " + std::to_string(prizeDurationMap[Prize::INDESTRUCTIBLE]), olc::DARK_YELLOW);
+			y += 15;
 		}
 			
 		if (pointCount > 1)
 		{
-			DrawString(100, y, "Double point time remaining: " + std::to_string(prizeDurationLimit - currentPrizeDuration), olc::DARK_YELLOW);
-			y += 30;
+			DrawString(100, y, "Double point time remaining: " + std::to_string(prizeDurationMap[Prize::DOUBLE_POINT]), olc::DARK_YELLOW);
+			y += 15;
 		}
 			
 		if (ship.speed > 2.0f)
 		{
-			DrawString(100, y, "Speed boost time remaining: " + std::to_string(prizeDurationLimit - currentPrizeDuration), olc::DARK_YELLOW);
+			DrawString(100, y, "Speed boost time remaining: " + std::to_string(prizeDurationMap[Prize::SPEED]), olc::DARK_YELLOW);
 		}
 
 
@@ -291,5 +316,9 @@ int main()
 	Example demo;
 	if (demo.Construct(400, SCREEN_HEIGHT, 2, 2))
 		demo.Start();
+	//std::unordered_map<int, float> mapa;
+	//mapa[1] = 1.1f;
+	//mapa[2] = 2.2f;
+	//std::cout << mapa[1] << std::endl;
 	return 0;
 }
