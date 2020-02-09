@@ -145,7 +145,8 @@ public:
 			{
 				if (!gameOver) 
 				{
-					Obstacle o(rand() % ScreenWidth(), quotient * i * 1.0f);
+					int x = meteorSprite.width + (std::rand() % (ScreenWidth() -  2 * meteorSprite.width + 1));
+					Obstacle o(x, quotient * i * 1.0f);
 					obstacles.push_back(o);
 				}
 			}
@@ -258,7 +259,7 @@ public:
 		if (n < 3) //n < 3
 		{
 			Prize p;
-			p.px = rand() % ScreenWidth();
+			p.px = speedSprite.width + (std::rand() % (ScreenWidth() - 2 * speedSprite.width + 1));
 			p.py = 0;
 			p.kind = rand() % 3;
 			prizes.push_back(p);
