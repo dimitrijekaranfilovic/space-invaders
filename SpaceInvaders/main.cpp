@@ -235,7 +235,7 @@ public:
 
 		//add prizes
 		int n = rand() % 5500;
-		if (n < 300) //n < 3
+		if (n < 3) //n < 3
 		{
 			Prize p;
 			p.px = rand() % ScreenWidth();
