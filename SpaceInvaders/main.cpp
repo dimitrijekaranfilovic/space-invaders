@@ -2,10 +2,6 @@
 #include "olcPixelGameEngine.h"
 #include "Objects.h"
 #include <vector>
-#include <string>
-#include <iostream>
-#include <chrono>
-#include <thread>
 #include <unordered_map> 
 #define SCREEN_HEIGHT 400
 using namespace std;
@@ -278,6 +274,12 @@ public:
 		//clear screen	
 		FillRect(0, 0, ScreenWidth(), ScreenHeight(), olc::BLACK);
 
+		//draw stars
+		for (unsigned int i = 0; i < stars.size(); ++i)
+		{
+			DrawCircle(stars[i].px, stars[i].py, stars[i].radius, olc::WHITE);
+			FillCircle(stars[i].px, stars[i].py, stars[i].radius, olc::WHITE);
+		}
 
 		//draw ship
 		DrawSprite(ship.px, ship.py, &shipSprite);
@@ -303,12 +305,6 @@ public:
 			DrawSprite(prizes[i].px, prizes[i].py, pointer);
 		}
 
-		//draw stars
-		for (unsigned int i = 0; i < stars.size(); ++i)
-		{
-			DrawCircle(stars[i].px, stars[i].py, stars[i].radius, olc::WHITE);
-			FillCircle(stars[i].px, stars[i].py, stars[i].radius, olc::WHITE);
-		}
 			
 		//display score
 		DrawString(0, 0, "Score: " + std::to_string(score), olc::DARK_YELLOW);
