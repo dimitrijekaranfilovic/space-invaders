@@ -15,6 +15,14 @@ bool squareSquareCollision(float x1, float y1, float x2, float y2, int w1, int w
 	return false;
 }
 
+struct Star
+{
+	float px, py;
+	float radius;
+	Star(float x, float y, float r): px(x), py(y), radius(r) {}
+};
+
+
 struct Prize
 {
 	enum Kind { SPEED = 0, DOUBLE_POINT = 1, INDESTRUCTIBLE = 2 };
@@ -74,6 +82,7 @@ public:
 	std::vector<Bullet> bullets;
 	std::vector<Obstacle> obstacles;
 	std::vector<Prize> prizes;
+	std::vector<Star> stars;
 	std::unordered_map<int, float> prizeDurationMap;
 	bool gameOver = false;
 
@@ -94,8 +103,19 @@ public:
 		prizeDurationMap[Prize::SPEED] = 0.0f;
 		prizeDurationMap[Prize::INDESTRUCTIBLE] = 0.0f;
 		prizeDurationMap[Prize::DOUBLE_POINT] = 0.0f;
+
+		//add stars to random positions
+		for (unsigned int i = 0; i < 25; ++i)
+		{
+			int r = rand() % 4 + 1;
+			int x = r + (std::rand() % (ScreenWidth() - 2 * r + 1));
+			int y = r + (std::rand() % (SCREEN_HEIGHT - 2 * r + 1));
+			Star s(x * 1.0f, y * 1.0f, r * 1.0f);
+			stars.push_back(s);
+		}
 		return true;
 	}
+
 	bool OnUserUpdate(float fElapsedTime) override
 	{
 		if ((GetKey(olc::Key::LEFT).bHeld || GetKey(olc::Key::A).bHeld) && ship.px > 0 && !gameOver)
@@ -271,6 +291,18 @@ public:
 			if(!gameOver)
 				prizes[i].py += prizeSpeed;
 		}
+
+		//update stars positions
+		for (unsigned int i = 0; i < stars.size(); ++i)
+		{
+			if (!gameOver)
+			{
+				stars[i].py += obstacleSpeed;
+				if (stars[i].py > SCREEN_HEIGHT)
+					stars[i].py = 0;
+
+			}
+		}
 			
 		//remove bullets that went out of bounds or have destroyed an obstacle
 		bullets.erase(std::remove_if(bullets.begin(), bullets.end(), [](const Bullet& b) {return b.used || b.py < 0; }), bullets.end());
@@ -283,6 +315,7 @@ public:
 
 		//clear screen	
 		FillRect(0, 0, ScreenWidth(), ScreenHeight(), olc::BLACK);
+
 
 		//draw ship
 		DrawSprite(ship.px, ship.py, &shipSprite);
@@ -308,12 +341,18 @@ public:
 			DrawSprite(prizes[i].px, prizes[i].py, pointer);
 		}
 
+		//draw stars
+		for (unsigned int i = 0; i < stars.size(); ++i)
+		{
+			DrawCircle(stars[i].px, stars[i].py, stars[i].radius, olc::WHITE);
+			FillCircle(stars[i].px, stars[i].py, stars[i].radius, olc::WHITE);
+		}
+			
 		//display score
 		DrawString(0, 0, "Score: " + std::to_string(score), olc::DARK_YELLOW);
 
-		int y = 0;
-		
 		//prize time remaining
+		int y = 0;
 		if (ship.indestructible)
 		{
 			DrawString(100, y, "Indestructible time remaining: " + std::to_string(prizeDurationMap[Prize::INDESTRUCTIBLE]), olc::DARK_YELLOW);
