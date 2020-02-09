@@ -90,6 +90,7 @@ public:
 		doublePointSprite.LoadFromFile("../resources/two1.png");
 		indestructibleSprite.LoadFromFile("../resources/strength1.png");
 		SetPixelMode(olc::Pixel::MASK);
+		//test
 		return true;
 	}
 	bool OnUserUpdate(float fElapsedTime) override
