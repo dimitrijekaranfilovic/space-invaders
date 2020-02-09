@@ -8,6 +8,8 @@ Legendary game written using C++ and olcPixelGameEngine. Shoutout to javidx9.
 
 <kbd>Space</kbd> to shoot
 
+<kbd>Enter</kbd> to start a new game when 'Game over!' is displayed
+
 ### Prizes
 
 ![picture](resources/speed9.png)    a prize which grants you 3x the speed
