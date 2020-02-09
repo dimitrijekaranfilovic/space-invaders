@@ -48,7 +48,7 @@ struct Obstacle
 
 
 
-class Example : public olc::PixelGameEngine
+class SpaceInvaders : public olc::PixelGameEngine
 {
 
 public:
@@ -77,17 +77,16 @@ public:
 	std::unordered_map<int, float> prizeDurationMap;
 	bool gameOver = false;
 
-	Example()
+	SpaceInvaders()
 	{
 		sAppName = "Space invaders";
 	}
 public:
 	bool OnUserCreate() override
 	{
-
 		shipSprite.LoadFromFile("../resources/spaceship21.png"); 
 		bulletSprite.LoadFromFile("../resources/bullet14.png"); 
-		meteorSprite.LoadFromFile("../resources/meteor12.png");  // meteor12
+		meteorSprite.LoadFromFile("../resources/meteor12.png");  
 		speedSprite.LoadFromFile("../resources/speed9.png");
 		doublePointSprite.LoadFromFile("../resources/two5.png"); 
 		indestructibleSprite.LoadFromFile("../resources/strength9.png"); 
@@ -138,7 +137,6 @@ public:
 				bullets[i].py -= bulletSpeed;
 		}
 			
-
 		//add obstacles
 		timePassed += fElapsedTime;
 		if ((score >= scoreLowerBound) && (score < scoreUpperBound) && (timePassed > timeBound))
@@ -192,7 +190,6 @@ public:
 		}
 		else
 			prizeDurationMap[Prize::DOUBLE_POINT] = prizeDurationMap[Prize::DOUBLE_POINT] - fElapsedTime;
-
 
 
 		if (prizeDurationMap[Prize::INDESTRUCTIBLE] <= 0.0f)
@@ -274,7 +271,6 @@ public:
 				prizes[i].py += prizeSpeed;
 		}
 			
-
 		//remove bullets that went out of bounds or have destroyed an obstacle
 		bullets.erase(std::remove_if(bullets.begin(), bullets.end(), [](const Bullet& b) {return b.used || b.py < 0; }), bullets.end());
 
@@ -330,24 +326,19 @@ public:
 		}
 			
 		if (ship.speed > 2.0f)
-		{
 			DrawString(100, y, "Speed boost time remaining: " + std::to_string(prizeDurationMap[Prize::SPEED]), olc::DARK_YELLOW);
-		}
+		
 
 		if (gameOver)
-		{
 			DrawString(ScreenWidth() / 2 - 50, ScreenHeight() / 2, "GAME OVER!", olc::DARK_RED, 3);
-			//std::this_thread::sleep_for(std::chrono::milliseconds(2000));
-			//exit(0);
-
-		}
+		
 
 		return true;
 	}
 };
 int main()
 {
-	Example demo;
+	SpaceInvaders demo;
 	if (demo.Construct(400, SCREEN_HEIGHT, 2, 2))
 		demo.Start();
 	return 0;
