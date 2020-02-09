@@ -7,6 +7,7 @@
 #include <thread>
 #include <unordered_map> 
 #define SCREEN_HEIGHT 400
+using namespace std;
 
 bool squareSquareCollision(float x1, float y1, float x2, float y2, int w1, int w2)
 {
@@ -259,7 +260,7 @@ public:
 					obstacles[i].destroyed = true;
 					bullets[j].used = true;
 					score += pointCount;
-					if (score % 5 == 0)
+					if (score % 5 == 0 || (pointCount == 2 && score % 5 == 1))
 					{
 						numObstacles += 1;
 						if (timeBound > 1)
@@ -372,7 +373,6 @@ public:
 		if (gameOver)
 			DrawString(ScreenWidth() / 2 - 50, ScreenHeight() / 2, "GAME OVER!", olc::DARK_RED, 3);
 		
-		//std::cout << obstacles.size() << std::endl;
 		return true;
 	}
 };
