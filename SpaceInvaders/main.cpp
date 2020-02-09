@@ -88,7 +88,7 @@ public:
 		bulletSprite.LoadFromFile("../resources/bullet14.png"); 
 		meteorSprite.LoadFromFile("../resources/meteor12.png");  // meteor12
 		speedSprite.LoadFromFile("../resources/speed9.png");
-		doublePointSprite.LoadFromFile("../resources/two3.png"); 
+		doublePointSprite.LoadFromFile("../resources/two5.png"); 
 		indestructibleSprite.LoadFromFile("../resources/strength9.png"); 
 		SetPixelMode(olc::Pixel::MASK);
 		return true;
