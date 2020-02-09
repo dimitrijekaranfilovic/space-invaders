@@ -166,7 +166,7 @@ public:
 				if (!gameOver) 
 				{
 					int x = meteorSprite.width + (std::rand() % (ScreenWidth() -  2 * meteorSprite.width + 1));
-					Obstacle o(x, quotient * i * 1.0f);
+					Obstacle o(x * 1.0f, quotient * i * 1.0f);
 					obstacles.push_back(o);
 				}
 			}
@@ -279,7 +279,7 @@ public:
 		if (n < 3 && !gameOver) //n < 3
 		{
 			Prize p;
-			p.px = speedSprite.width + (std::rand() % (ScreenWidth() - 2 * speedSprite.width + 1));
+			p.px = (speedSprite.width + (std::rand() % (ScreenWidth() - 2 * speedSprite.width + 1))) * 1.0f;
 			p.py = 0;
 			p.kind = rand() % 3;
 			prizes.push_back(p);
@@ -372,7 +372,7 @@ public:
 		if (gameOver)
 			DrawString(ScreenWidth() / 2 - 50, ScreenHeight() / 2, "GAME OVER!", olc::DARK_RED, 3);
 		
-
+		//std::cout << obstacles.size() << std::endl;
 		return true;
 	}
 };
