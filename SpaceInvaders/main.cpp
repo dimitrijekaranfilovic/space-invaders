@@ -133,7 +133,7 @@ public:
 		//update obstacles' positions
 		for (unsigned int i = 0; i < obstacles.size(); ++i)
 		{
-			if (squareSquareCollision(ship.px, ship.py, obstacles[i].px, obstacles[i].py, shipSprite.width, meteorSprite.width) && !ship.indestructible)
+			if (squareSquareCollision(ship.px, ship.py, obstacles[i].px, obstacles[i].py, shipSprite.width-5, meteorSprite.width-5) && !ship.indestructible)
 			{
 				std::cout << "GAME OVER!\n" << "Your score was: " << score << std::endl;
 				std::this_thread::sleep_for(std::chrono::milliseconds(2000));
