@@ -6,6 +6,7 @@
 #include <chrono>
 #include <thread>
 #define SCREEN_HEIGHT 400
+#define HIGH_REFRESH_RATE 1
 
 bool squareSquareCollision(float x1, float y1, float x2, float y2, int w1, int w2)
 {
@@ -83,13 +84,17 @@ public:
 public:
 	bool OnUserCreate() override
 	{
+#if HIGH_REFRESH_RATE
+		SetPixelMode(olc::Pixel::MASK);
+#else
+		SetPixelMode(olc::Pixel::ALPHA);
+#endif
 		shipSprite.LoadFromFile("../resources/spaceship2.png");
 		bulletSprite.LoadFromFile("../resources/bullet1.png");
 		meteorSprite.LoadFromFile("../resources/meteor4.png");
 		speedSprite.LoadFromFile("../resources/speed3.png");
 		doublePointSprite.LoadFromFile("../resources/two1.png");
 		indestructibleSprite.LoadFromFile("../resources/strength1.png");
-		SetPixelMode(olc::Pixel::MASK);
 		//test
 		return true;
 	}
@@ -104,7 +109,7 @@ public:
 
 		if (GetKey(olc::Key::SPACE).bPressed)
 		{
-			Bullet b((ship.px + bulletSprite.width / 2), ship.py);
+			Bullet b(ship.px, ship.py);
 			bullets.push_back(b);
 		}
 
@@ -188,7 +193,7 @@ public:
 		{
 			for (unsigned int j = 0; j < bullets.size(); ++j)
 			{
-				if (squareSquareCollision(obstacles[i].px, obstacles[i].py, bullets[j].px, bullets[j].py, meteorSprite.width, bulletSprite.width))
+				if (squareSquareCollision(obstacles[i].px, obstacles[i].py, bullets[j].px, bullets[j].py, meteorSprite.width-5, bulletSprite.width-5))
 				{
 					obstacles[i].destroyed = true;
 					bullets[j].used = true;
