@@ -27,3 +27,5 @@ Legendary game written using C++ and olcPixelGameEngine. Shoutout to javidx9.
 ![picture](resources/bullet14.png)  bullet that you fire
 
 ![picture](resources/screenshot2.png)
+
+**Another remark: all icons are custom designed(by me) because of copyrights, so do not be surprised by their appearance.**
