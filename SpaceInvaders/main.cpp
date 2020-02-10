@@ -24,6 +24,7 @@ public:
 	olc::Sprite indestructibleSprite;
 	olc::Sprite speedSprite;
 	olc::Sprite doublePointSprite;
+	olc::Sprite bossSprite;
 	Ship ship;
 	int prizeDurationLimit = 5;
 	int pointCount = 1;
@@ -54,9 +55,10 @@ public:
 		shipSprite.LoadFromFile("../resources/spaceship21.png"); 
 		bulletSprite.LoadFromFile("../resources/bullet14.png"); 
 		meteorSprite.LoadFromFile("../resources/meteor12.png");  
-		speedSprite.LoadFromFile("../resources/speed9.png");
+		speedSprite.LoadFromFile("../resources/speed10.png");
 		doublePointSprite.LoadFromFile("../resources/two5.png"); 
 		indestructibleSprite.LoadFromFile("../resources/strength9.png"); 
+		bossSprite.LoadFromFile("../resources/boss3.png");
 		SetPixelMode(olc::Pixel::MASK);
 		prizeDurationMap[Prize::SPEED] = 0.0f;
 		prizeDurationMap[Prize::INDESTRUCTIBLE] = 0.0f;
@@ -232,6 +234,10 @@ public:
 			}
 		}
 
+		//add boss
+
+
+
 		//add prizes
 		int n = rand() % 5500;
 		if (n < 3 && !gameOver) //n < 3
@@ -330,6 +336,8 @@ public:
 		if (gameOver)
 			DrawString(ScreenWidth() / 2 - 50, ScreenHeight() / 2, "GAME OVER!", olc::DARK_RED, 3);
 		
+		//DrawSprite(200, 200, &bossSprite);
+
 		return true;
 	}
 };
