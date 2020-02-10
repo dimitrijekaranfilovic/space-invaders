@@ -26,6 +26,12 @@ struct Ship
 	float px = 150.0f;
 	float py = 350.0f;
 	float speed = 2.0f;
+	olc::Sprite sprite;
+	std::string imagePath = "../resources/spaceship21.png";
+	Ship()
+	{
+		sprite.LoadFromFile(imagePath);
+	}
 	bool indestructible = false;
 };
 
@@ -45,12 +51,22 @@ struct Obstacle
 
 struct Boss
 {
-	float px;
-	float py;
+	float px = 170;
+	float py = 60;
+	bool active = false;
+	int currentHealth;
+	int maxHealth;
 	olc::Sprite sprite;
 	std::string imagePath = "../resources/boss4.png";
-	Boss(float x=170, float y=40): px(x), py(y)
+	Boss()
 	{
 		sprite.LoadFromFile(imagePath);
 	}
+	
+	void setHealth(int health)
+	{
+		maxHealth = health;
+		currentHealth = health;
+	}
+
 };

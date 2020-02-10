@@ -1,26 +1,37 @@
 #define OLC_PGE_APPLICATION
+#include "olcPixelGameEngine.h"
 #include "Objects.h"
+#include <vector>
+#include <unordered_map> 
+#define SCREEN_HEIGHT 400
+#define SHIP_WIDTH 14
+#define SHIP_HEIGHT 18
+#define METEOR_SIZE 16
+#define DOUBLE_HEIGHT 16
+#define DOUBLE_WIDTH 18
+#define STRENGTH_SIZE 22
+#define SPEED_HEIGHT 20
+#define SPEED_WIDTH 13
+#define BULLET_HEIGHT 16
+#define BULLET_WIDTH 16
+#define BOSS_SIZE 27
 
-bool squareSquareCollision(float x1, float y1, float x2, float y2, int w1, int w2)
+bool squareSquareCollision(float x1, float y1, float x2, float y2, int w1, int w2, int h1, int h2)
 {
-	if (x1 + w1 > x2 && x2 + w2 > x1 && y1 + w1 > y2 && y2 + w2 > y1)
-		return true;
-	return false;
+	return x1 + w1 >= x2 && x2 + w2 >= x1 && y1 + h1 >= y2 && y2 + h2 >= y1;
 }
-
 
 class SpaceInvaders : public olc::PixelGameEngine
 {
 
 public:
-	olc::Sprite shipSprite;
 	olc::Sprite bulletSprite;
 	olc::Sprite meteorSprite;
 	olc::Sprite indestructibleSprite;
 	olc::Sprite speedSprite;
 	olc::Sprite doublePointSprite;
-	Ship ship;
 	Boss boss;
+	Ship ship;
 	int prizeDurationLimit = 5;
 	int pointCount = 1;
 	int score = 0;
@@ -47,16 +58,17 @@ public:
 public:
 	bool OnUserCreate() override
 	{
-		shipSprite.LoadFromFile("../resources/spaceship21.png"); 
-		bulletSprite.LoadFromFile("../resources/bullet14.png"); 
-		meteorSprite.LoadFromFile("../resources/meteor12.png");  
+		bulletSprite.LoadFromFile("../resources/bullet14.png");
+		meteorSprite.LoadFromFile("../resources/meteor12.png");
 		speedSprite.LoadFromFile("../resources/speed10.png");
-		doublePointSprite.LoadFromFile("../resources/two5.png"); 
-		indestructibleSprite.LoadFromFile("../resources/strength9.png"); 
+		doublePointSprite.LoadFromFile("../resources/two5.png");
+		indestructibleSprite.LoadFromFile("../resources/strength9.png");
 		SetPixelMode(olc::Pixel::MASK);
 		prizeDurationMap[Prize::SPEED] = 0.0f;
 		prizeDurationMap[Prize::INDESTRUCTIBLE] = 0.0f;
 		prizeDurationMap[Prize::DOUBLE_POINT] = 0.0f;
+
+		boss.setHealth(20);
 
 		//add stars to random positions
 		for (unsigned int i = 0; i < 25; ++i)
@@ -75,7 +87,7 @@ public:
 		if ((GetKey(olc::Key::LEFT).bHeld || GetKey(olc::Key::A).bHeld) && ship.px > 0 && !gameOver)
 			ship.px -= ship.speed;
 
-		if ((GetKey(olc::Key::RIGHT).bHeld || GetKey(olc::Key::D).bHeld) && (ship.px < ScreenWidth() - shipSprite.width) && !gameOver)
+		if ((GetKey(olc::Key::RIGHT).bHeld || GetKey(olc::Key::D).bHeld) && (ship.px < ScreenWidth() - ship.sprite.width) && !gameOver)
 			ship.px += ship.speed;
 
 
@@ -107,19 +119,19 @@ public:
 		//update bullets' positions
 		for (unsigned int i = 0; i < bullets.size(); i++)
 		{
-			if(!gameOver)
+			if (!gameOver)
 				bullets[i].py -= bulletSpeed;
 		}
-			
+
 		//add obstacles
 		timePassed += fElapsedTime;
-		if ((score >= scoreLowerBound) && (score < scoreUpperBound) && (timePassed > timeBound))
+		if ((score >= scoreLowerBound) && (score < scoreUpperBound) && (timePassed > timeBound) && !boss.active)
 		{
 			for (int i = 0; i < numObstacles; ++i)
 			{
-				if (!gameOver) 
+				if (!gameOver)
 				{
-					int x = meteorSprite.width + (std::rand() % (ScreenWidth() -  2 * meteorSprite.width + 1));
+					int x = meteorSprite.width + (std::rand() % (ScreenWidth() - 2 * meteorSprite.width + 1));
 					Obstacle o(x * 1.0f, quotient * i * 1.0f);
 					obstacles.push_back(o);
 				}
@@ -136,18 +148,18 @@ public:
 		//update obstacles' positions
 		for (unsigned int i = 0; i < obstacles.size(); ++i)
 		{
-			if (squareSquareCollision(ship.px, ship.py, obstacles[i].px, obstacles[i].py, shipSprite.width - 5, meteorSprite.width - 5) && !ship.indestructible)
+			if (squareSquareCollision(ship.px, ship.py, obstacles[i].px, obstacles[i].py, SHIP_WIDTH, METEOR_SIZE, SHIP_HEIGHT, METEOR_SIZE) && !ship.indestructible)
 			{
 				gameOver = true;
 			}
 			else
 			{
-				if(!gameOver)
+				if (!gameOver)
 					obstacles[i].py += obstacleSpeed;
 			}
 		}
 
-		
+
 		//see if prizes' effects have worn off
 		if (prizeDurationMap[Prize::SPEED] <= 0.0f)
 		{
@@ -172,16 +184,33 @@ public:
 			prizeDurationMap[Prize::INDESTRUCTIBLE] = 0.0f;
 			ship.indestructible = false;
 		}
-			
+
 		else
 			prizeDurationMap[Prize::INDESTRUCTIBLE] = prizeDurationMap[Prize::INDESTRUCTIBLE] - fElapsedTime;
-		
+
 
 
 		//check if any of the prizes was collected and apply its effects
 		for (unsigned int i = 0; i < prizes.size(); ++i)
 		{
-			if (squareSquareCollision(ship.px, ship.py, prizes[i].px, prizes[i].py, shipSprite.width, speedSprite.width))
+			int w2;
+			int h2;
+			switch (prizes[i].kind)
+			{
+			case Prize::DOUBLE_POINT:
+				w2 = DOUBLE_WIDTH;
+				h2 = DOUBLE_HEIGHT;
+				break;
+			case Prize::INDESTRUCTIBLE:
+				w2 = STRENGTH_SIZE;
+				h2 = w2;
+				break;
+			case Prize::SPEED:
+				w2 = SPEED_WIDTH;
+				h2 = SPEED_HEIGHT;
+				break;
+			}
+			if (squareSquareCollision(ship.px, ship.py, prizes[i].px, prizes[i].py, SHIP_WIDTH, w2, SHIP_HEIGHT, h2))
 			{
 				prizes[i].collected = true;
 				switch (prizes[i].kind)
@@ -208,7 +237,7 @@ public:
 		{
 			for (unsigned int j = 0; j < bullets.size(); ++j)
 			{
-				if (squareSquareCollision(obstacles[i].px, obstacles[i].py, bullets[j].px, bullets[j].py, meteorSprite.width-5, bulletSprite.width-5))
+				if (squareSquareCollision(obstacles[i].px, obstacles[i].py, bullets[j].px, bullets[j].py, METEOR_SIZE, BULLET_WIDTH, METEOR_SIZE, BULLET_HEIGHT))
 				{
 					obstacles[i].destroyed = true;
 					bullets[j].used = true;
@@ -224,13 +253,35 @@ public:
 						scoreUpperBound += 5;
 						obstacleSpeed *= 1.15f;
 					}
+					if (score % 1 == 0 || (pointCount == 2 && score % 20 == 1))
+						boss.active = true;
 				}
 			}
 		}
 
+		//check if any of the bullets have hit the boss
+		if (boss.active)
+		{
+			if (boss.currentHealth == 0)
+				boss.active = false;
+			else
+			{
+				for (unsigned int i = 0; i < bullets.size(); ++i)
+				{
+					if (squareSquareCollision(bullets[i].px, bullets[i].py, boss.px, boss.py, BULLET_WIDTH, BOSS_SIZE, BULLET_HEIGHT, BOSS_SIZE))
+					{
+						bullets[i].used = true;
+						boss.currentHealth -= 1;
+					}
+				}
+			}
+		}
+
+
+
 		//add prizes
 		int n = rand() % 5500;
-		if (n < 3 && !gameOver) //n < 3
+		if (n < 3 && !gameOver && !boss.active) //n < 3
 		{
 			Prize p;
 			p.px = (speedSprite.width + (std::rand() % (ScreenWidth() - 2 * speedSprite.width + 1))) * 1.0f;
@@ -242,7 +293,7 @@ public:
 		//update prizes' position
 		for (unsigned int i = 0; i < prizes.size(); ++i)
 		{
-			if(!gameOver)
+			if (!gameOver)
 				prizes[i].py += prizeSpeed;
 		}
 
@@ -257,15 +308,20 @@ public:
 
 			}
 		}
-			
+
+
 		//remove bullets that went out of bounds or have destroyed an obstacle
 		bullets.erase(std::remove_if(bullets.begin(), bullets.end(), [](const Bullet& b) {return b.used || b.py < 0; }), bullets.end());
 
 		//remove obstacles that went out of bounds or have been destroyed
 		obstacles.erase(std::remove_if(obstacles.begin(), obstacles.end(), [](const Obstacle& o) {return o.destroyed || o.py > SCREEN_HEIGHT; }), obstacles.end());
+		if (boss.active)
+			obstacles.clear();
 
 		//remove prizes that were collected or went out ouf bounds
 		prizes.erase(std::remove_if(prizes.begin(), prizes.end(), [](const Prize& p) {return p.collected || p.py > SCREEN_HEIGHT; }), prizes.end());
+		if (boss.active)
+			prizes.clear();
 
 		//clear screen	
 		FillRect(0, 0, ScreenWidth(), ScreenHeight(), olc::BLACK);
@@ -278,7 +334,19 @@ public:
 		}
 
 		//draw ship
-		DrawSprite(ship.px, ship.py, &shipSprite);
+		DrawSprite(ship.px, ship.py, &ship.sprite);
+
+
+		//drawing boss and its health
+		if (boss.active)
+		{
+			DrawSprite(boss.px, boss.py, &boss.sprite);
+			DrawString(80, 0, "Health ", olc::DARK_RED);
+			float q = 1.0f * boss.currentHealth / boss.maxHealth;
+			std::cout << q << std::endl;
+			DrawLine(130, 5, 130 + q * 170, 5, olc::DARK_RED);
+		}
+			
 
 		//draw bullets
 		for (unsigned int i = 0; i < bullets.size(); ++i)
@@ -301,7 +369,7 @@ public:
 			DrawSprite(prizes[i].px, prizes[i].py, pointer);
 		}
 
-			
+
 		//display score
 		DrawString(0, 0, "Score: " + std::to_string(score), olc::DARK_YELLOW);
 
@@ -312,21 +380,19 @@ public:
 			DrawString(100, y, "Indestructible time remaining: " + std::to_string(prizeDurationMap[Prize::INDESTRUCTIBLE]), olc::DARK_YELLOW);
 			y += 15;
 		}
-			
+
 		if (pointCount > 1)
 		{
 			DrawString(100, y, "Double point time remaining: " + std::to_string(prizeDurationMap[Prize::DOUBLE_POINT]), olc::DARK_YELLOW);
 			y += 15;
 		}
-			
+
 		if (ship.speed > 2.0f)
 			DrawString(100, y, "Speed boost time remaining: " + std::to_string(prizeDurationMap[Prize::SPEED]), olc::DARK_YELLOW);
-		
+
 
 		if (gameOver)
 			DrawString(ScreenWidth() / 2 - 50, ScreenHeight() / 2, "GAME OVER!", olc::DARK_RED, 3);
-		
-		DrawSprite(boss.px, boss.py, &boss.sprite);
 
 		return true;
 	}
