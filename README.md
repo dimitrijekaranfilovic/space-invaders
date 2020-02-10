@@ -12,7 +12,7 @@ Legendary game written using C++ and olcPixelGameEngine. Shoutout to javidx9.
 
 ### Prizes
 
-![picture](resources/speed9.png)    a prize which grants you 3x the speed
+![picture](resources/speed10.png)    a prize which grants you 3x the speed
 
 ![picture](resources/strength9.png) a prize which grants you indestructability(collision with meteor doesn't mean game over)
 
