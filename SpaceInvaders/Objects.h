@@ -37,3 +37,8 @@ struct Obstacle
 	bool destroyed = false;
 	Obstacle(float x, float y) : px(x), py(y) {}
 };
+
+struct Boss
+{
+	float px, py;
+};
