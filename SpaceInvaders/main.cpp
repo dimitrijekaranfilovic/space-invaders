@@ -58,7 +58,7 @@ public:
 		speedSprite.LoadFromFile("../resources/speed10.png");
 		doublePointSprite.LoadFromFile("../resources/two5.png"); 
 		indestructibleSprite.LoadFromFile("../resources/strength9.png"); 
-		bossSprite.LoadFromFile("../resources/boss3.png");
+		bossSprite.LoadFromFile("../resources/boss4.png");
 		SetPixelMode(olc::Pixel::MASK);
 		prizeDurationMap[Prize::SPEED] = 0.0f;
 		prizeDurationMap[Prize::INDESTRUCTIBLE] = 0.0f;
