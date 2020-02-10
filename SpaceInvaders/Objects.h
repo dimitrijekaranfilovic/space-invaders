@@ -1,4 +1,9 @@
 #pragma once
+#include "olcPixelGameEngine.h"
+#include <string>
+#include <vector>
+#include <unordered_map> 
+#define SCREEN_HEIGHT 400
 struct Star
 {
 	float px, py;
@@ -40,5 +45,12 @@ struct Obstacle
 
 struct Boss
 {
-	float px, py;
+	float px;
+	float py;
+	olc::Sprite sprite;
+	std::string imagePath = "../resources/boss4.png";
+	Boss(float x=170, float y=40): px(x), py(y)
+	{
+		sprite.LoadFromFile(imagePath);
+	}
 };

@@ -1,10 +1,5 @@
 #define OLC_PGE_APPLICATION
-#include "olcPixelGameEngine.h"
 #include "Objects.h"
-#include <vector>
-#include <unordered_map> 
-#define SCREEN_HEIGHT 400
-using namespace std;
 
 bool squareSquareCollision(float x1, float y1, float x2, float y2, int w1, int w2)
 {
@@ -24,8 +19,8 @@ public:
 	olc::Sprite indestructibleSprite;
 	olc::Sprite speedSprite;
 	olc::Sprite doublePointSprite;
-	olc::Sprite bossSprite;
 	Ship ship;
+	Boss boss;
 	int prizeDurationLimit = 5;
 	int pointCount = 1;
 	int score = 0;
@@ -58,7 +53,6 @@ public:
 		speedSprite.LoadFromFile("../resources/speed10.png");
 		doublePointSprite.LoadFromFile("../resources/two5.png"); 
 		indestructibleSprite.LoadFromFile("../resources/strength9.png"); 
-		bossSprite.LoadFromFile("../resources/boss4.png");
 		SetPixelMode(olc::Pixel::MASK);
 		prizeDurationMap[Prize::SPEED] = 0.0f;
 		prizeDurationMap[Prize::INDESTRUCTIBLE] = 0.0f;
@@ -331,7 +325,8 @@ public:
 
 		if (gameOver)
 			DrawString(ScreenWidth() / 2 - 50, ScreenHeight() / 2, "GAME OVER!", olc::DARK_RED, 3);
-		DrawSprite(200, 200, &bossSprite);
+		
+		DrawSprite(boss.px, boss.py, &boss.sprite);
 
 		return true;
 	}
