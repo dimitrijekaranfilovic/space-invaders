@@ -4,15 +4,22 @@
 #include <vector>
 #include <unordered_map> 
 #define SCREEN_HEIGHT 400
-using namespace std;
+#define SHIP_WIDTH 14
+#define SHIP_HEIGHT 18
+#define METEOR_SIZE 16
+#define DOUBLE_HEIGHT 16
+#define DOUBLE_WIDTH 18
+#define STRENGTH_SIZE 22
+#define SPEED_HEIGHT 20
+#define SPEED_WIDTH 13
+#define BULLET_HEIGHT 16
+#define BULLET_WIDTH 16
 
-bool squareSquareCollision(float x1, float y1, float x2, float y2, int w1, int w2)
+
+bool squareSquareCollision(float x1, float y1, float x2, float y2, int w1, int w2, int h1, int h2)
 {
-	if (x1 + w1 > x2 && x2 + w2 > x1 && y1 + w1 > y2 && y2 + w2 > y1)
-		return true;
-	return false;
+	return x1 + w1 >= x2 && x2 + w2 >= x1 && y1 + h1 >= y2 && y2 + h2 >= y1;
 }
-
 
 class SpaceInvaders : public olc::PixelGameEngine
 {
@@ -24,7 +31,6 @@ public:
 	olc::Sprite indestructibleSprite;
 	olc::Sprite speedSprite;
 	olc::Sprite doublePointSprite;
-	olc::Sprite bossSprite;
 	Ship ship;
 	int prizeDurationLimit = 5;
 	int pointCount = 1;
@@ -58,7 +64,6 @@ public:
 		speedSprite.LoadFromFile("../resources/speed10.png");
 		doublePointSprite.LoadFromFile("../resources/two5.png"); 
 		indestructibleSprite.LoadFromFile("../resources/strength9.png"); 
-		bossSprite.LoadFromFile("../resources/boss4.png");
 		SetPixelMode(olc::Pixel::MASK);
 		prizeDurationMap[Prize::SPEED] = 0.0f;
 		prizeDurationMap[Prize::INDESTRUCTIBLE] = 0.0f;
@@ -142,7 +147,7 @@ public:
 		//update obstacles' positions
 		for (unsigned int i = 0; i < obstacles.size(); ++i)
 		{
-			if (squareSquareCollision(ship.px, ship.py, obstacles[i].px, obstacles[i].py, shipSprite.width - 5, meteorSprite.width - 5) && !ship.indestructible)
+			if (squareSquareCollision(ship.px, ship.py, obstacles[i].px, obstacles[i].py, SHIP_WIDTH, METEOR_SIZE, SHIP_HEIGHT, METEOR_SIZE) && !ship.indestructible)
 			{
 				gameOver = true;
 			}
@@ -187,7 +192,24 @@ public:
 		//check if any of the prizes was collected and apply its effects
 		for (unsigned int i = 0; i < prizes.size(); ++i)
 		{
-			if (squareSquareCollision(ship.px, ship.py, prizes[i].px, prizes[i].py, shipSprite.width, speedSprite.width))
+			int w2;
+			int h2;
+			switch (prizes[i].kind)
+			{
+			case Prize::DOUBLE_POINT:
+				w2 = DOUBLE_WIDTH;
+				h2 = DOUBLE_HEIGHT;
+				break;
+			case Prize::INDESTRUCTIBLE:
+				w2 = STRENGTH_SIZE;
+				h2 = w2;
+				break;
+			case Prize::SPEED:
+				w2 = SPEED_WIDTH;
+				h2 = SPEED_HEIGHT;
+				break;
+			}
+			if (squareSquareCollision(ship.px, ship.py, prizes[i].px, prizes[i].py, SHIP_WIDTH, w2, SHIP_HEIGHT, h2))
 			{
 				prizes[i].collected = true;
 				switch (prizes[i].kind)
@@ -214,7 +236,7 @@ public:
 		{
 			for (unsigned int j = 0; j < bullets.size(); ++j)
 			{
-				if (squareSquareCollision(obstacles[i].px, obstacles[i].py, bullets[j].px, bullets[j].py, meteorSprite.width-5, bulletSprite.width-5))
+				if (squareSquareCollision(obstacles[i].px, obstacles[i].py, bullets[j].px, bullets[j].py, METEOR_SIZE, BULLET_WIDTH, METEOR_SIZE, BULLET_HEIGHT))
 				{
 					obstacles[i].destroyed = true;
 					bullets[j].used = true;
@@ -336,8 +358,6 @@ public:
 		if (gameOver)
 			DrawString(ScreenWidth() / 2 - 50, ScreenHeight() / 2, "GAME OVER!", olc::DARK_RED, 3);
 		
-		//DrawSprite(200, 200, &bossSprite);
-
 		return true;
 	}
 };
