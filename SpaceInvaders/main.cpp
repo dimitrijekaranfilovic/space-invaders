@@ -68,7 +68,7 @@ public:
 		prizeDurationMap[Prize::INDESTRUCTIBLE] = 0.0f;
 		prizeDurationMap[Prize::DOUBLE_POINT] = 0.0f;
 
-		boss.setHealth(20);
+		boss.setHealth(10);
 
 		//add stars to random positions
 		for (unsigned int i = 0; i < 25; ++i)
@@ -254,7 +254,12 @@ public:
 						obstacleSpeed *= 1.15f;
 					}
 					if (score % 1 == 0 || (pointCount == 2 && score % 20 == 1))
+					{
 						boss.active = true;
+						boss.setHealth(boss.maxHealth + 10);
+						std::cout << "BOSS" << std::endl;
+					}
+						
 				}
 			}
 		}
@@ -343,7 +348,7 @@ public:
 			DrawSprite(boss.px, boss.py, &boss.sprite);
 			DrawString(80, 0, "Health ", olc::DARK_RED);
 			float q = 1.0f * boss.currentHealth / boss.maxHealth;
-			std::cout << q << std::endl;
+			//std::cout << q << std::endl;
 			DrawLine(130, 5, 130 + q * 170, 5, olc::DARK_RED);
 		}
 			
