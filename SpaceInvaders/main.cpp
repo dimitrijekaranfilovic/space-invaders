@@ -1,19 +1,17 @@
 #define OLC_PGE_APPLICATION
 #include "olcPixelGameEngine.h"
 #include "Objects.h"
-#include <vector>
-#include <unordered_map> 
 #define SCREEN_HEIGHT 400
 #define SHIP_WIDTH 14
 #define SHIP_HEIGHT 18
-#define METEOR_SIZE 16
+#define METEOR_SIZE 21
 #define DOUBLE_HEIGHT 16
 #define DOUBLE_WIDTH 18
 #define STRENGTH_SIZE 22
 #define SPEED_HEIGHT 20
 #define SPEED_WIDTH 13
-#define BULLET_HEIGHT 16
-#define BULLET_WIDTH 16
+#define BULLET_HEIGHT 14
+#define BULLET_WIDTH 3
 #define BOSS_SIZE 27
 
 bool squareSquareCollision(float x1, float y1, float x2, float y2, int w1, int w2, int h1, int h2)
@@ -259,6 +257,7 @@ public:
 						boss.setHealth(boss.maxHealth + 10);
 						std::cout << "BOSS" << std::endl;
 					}
+					
 						
 				}
 			}
@@ -355,12 +354,18 @@ public:
 
 		//draw bullets
 		for (unsigned int i = 0; i < bullets.size(); ++i)
-			DrawSprite(bullets[i].px, bullets[i].py, &bulletSprite);
+		{
+			//DrawSprite(bullets[i].px, bullets[i].py, &bulletSprite);
+			DrawRect(bullets[i].px, bullets[i].py, BULLET_WIDTH, BULLET_HEIGHT, olc::YELLOW);
+			FillRect(bullets[i].px, bullets[i].py, BULLET_WIDTH, BULLET_HEIGHT, olc::YELLOW);
+		}
+			
 
 		//draw obstacles
 		for (unsigned int i = 0; i < obstacles.size(); ++i)
 			DrawSprite(obstacles[i].px, obstacles[i].py, &meteorSprite);
-
+		
+			
 		//draw prizes
 		for (unsigned int i = 0; i < prizes.size(); ++i)
 		{
@@ -380,19 +385,19 @@ public:
 
 		//prize time remaining
 		int y = 0;
-		if (ship.indestructible)
+		if (ship.indestructible && !boss.active)
 		{
 			DrawString(100, y, "Indestructible time remaining: " + std::to_string(prizeDurationMap[Prize::INDESTRUCTIBLE]), olc::DARK_YELLOW);
 			y += 15;
 		}
 
-		if (pointCount > 1)
+		if (pointCount > 1 && !boss.active)
 		{
 			DrawString(100, y, "Double point time remaining: " + std::to_string(prizeDurationMap[Prize::DOUBLE_POINT]), olc::DARK_YELLOW);
 			y += 15;
 		}
 
-		if (ship.speed > 2.0f)
+		if (ship.speed > 2.0f && !boss.active)
 			DrawString(100, y, "Speed boost time remaining: " + std::to_string(prizeDurationMap[Prize::SPEED]), olc::DARK_YELLOW);
 
 
