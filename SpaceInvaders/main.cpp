@@ -99,7 +99,7 @@ public:
 			ship.px = 150.0f;
 			ship.py = 350.0f;
 			boss.setHealth(10);
-			boss.speed = 0.6f;
+			boss.parts = 30;
 			boss.active = false;
 		}
 
@@ -244,7 +244,7 @@ public:
 					{
 						boss.active = true;
 						boss.setHealth(boss.maxHealth + 10);
-						boss.speed *= 1.25;
+						boss.parts *= 1.25;
 					}						
 				}
 			}
@@ -303,7 +303,7 @@ public:
 		if (boss.active)
 		{
 			int num = rand() % 3000;
-			if (num < 10 && !boss.doTheDive && abs(boss.px - ship.px) > 20)
+			if (num < 10 && !boss.doTheDive)
 				boss.dive(ship.px, ship.py);
 		}
 

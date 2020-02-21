@@ -81,10 +81,11 @@ struct Boss
 {
 	float px = BOSS_X;
 	float py = BOSS_Y;
-	float speed = 0.6f;
+	float parts = 50;
+	
 	bool active = false;
 	bool doTheDive = false;
-	float y0, x0, y1, x1;
+	float y0, x0, y1, x1, speed;
 	float q;
 	int currentHealth;
 	int maxHealth;
@@ -104,6 +105,7 @@ struct Boss
 
 	void dive(float ship_x, float ship_y)
 	{
+		speed = abs(ship_x - px) / parts * 1.0f;
 		x0 = px;
 		y0 = py;
 		x1 = ship_x;
@@ -113,6 +115,7 @@ struct Boss
 			q = -1;
 		else
 			q = 1;
+
 	}
 
 	float interpolate(float x)
