@@ -1,18 +1,4 @@
-#define OLC_PGE_APPLICATION
-#include "olcPixelGameEngine.h"
 #include "Objects.h"
-#define SCREEN_HEIGHT 400
-#define SHIP_WIDTH 14
-#define SHIP_HEIGHT 18
-#define METEOR_SIZE 21
-#define DOUBLE_HEIGHT 16
-#define DOUBLE_WIDTH 18
-#define STRENGTH_SIZE 22
-#define SPEED_HEIGHT 20
-#define SPEED_WIDTH 13
-#define BULLET_HEIGHT 14
-#define BULLET_WIDTH 3
-#define BOSS_SIZE 27
 
 bool squareSquareCollision(float x1, float y1, float x2, float y2, int w1, int w2, int h1, int h2)
 {
@@ -91,7 +77,7 @@ public:
 
 		if (GetKey(olc::Key::SPACE).bPressed && !gameOver)
 		{
-			Bullet b(ship.px, ship.py);
+			Bullet b(ship.px + SHIP_WIDTH / 2, ship.py);
 			bullets.push_back(b);
 		}
 		//start a new game
@@ -112,6 +98,9 @@ public:
 			ship.indestructible = false;
 			ship.px = 150.0f;
 			ship.py = 350.0f;
+			boss.setHealth(10);
+			boss.speed = 0.6f;
+			boss.active = false;
 		}
 
 		//update bullets' positions
@@ -255,10 +244,8 @@ public:
 					{
 						boss.active = true;
 						boss.setHealth(boss.maxHealth + 10);
-						std::cout << "BOSS" << std::endl;
-					}
-					
-						
+						boss.speed *= 1.25;
+					}						
 				}
 			}
 		}
@@ -280,7 +267,6 @@ public:
 				}
 			}
 		}
-
 
 
 		//add prizes
@@ -313,7 +299,32 @@ public:
 			}
 		}
 
+		//decide whether to dive
+		if (boss.active)
+		{
+			int num = rand() % 3000;
+			if (num < 10 && !boss.doTheDive && abs(boss.px - ship.px) > 20)
+				boss.dive(ship.px, ship.py);
+		}
 
+		//dive in the calculated direction
+		if (boss.active && boss.doTheDive && !gameOver)
+		{
+			boss.px += (boss.q * boss.speed);
+			boss.py = boss.interpolate(boss.px);
+
+			if (boss.py > SCREEN_HEIGHT)
+			{
+				boss.px = BOSS_X;
+				boss.py = BOSS_Y;
+				boss.doTheDive = false;
+			}
+		}
+		
+		//see if ship has collided with the boss
+		if (boss.active && squareSquareCollision(ship.px, ship.py, boss.px, boss.py, SHIP_WIDTH, BOSS_SIZE, SHIP_HEIGHT, BOSS_SIZE))
+			gameOver = true;
+		
 		//remove bullets that went out of bounds or have destroyed an obstacle
 		bullets.erase(std::remove_if(bullets.begin(), bullets.end(), [](const Bullet& b) {return b.used || b.py < 0; }), bullets.end());
 
@@ -347,7 +358,6 @@ public:
 			DrawSprite(boss.px, boss.py, &boss.sprite);
 			DrawString(80, 0, "Health ", olc::DARK_RED);
 			float q = 1.0f * boss.currentHealth / boss.maxHealth;
-			//std::cout << q << std::endl;
 			DrawLine(130, 5, 130 + q * 170, 5, olc::DARK_RED);
 		}
 			
@@ -365,7 +375,6 @@ public:
 		for (unsigned int i = 0; i < obstacles.size(); ++i)
 			DrawSprite(obstacles[i].px, obstacles[i].py, &meteorSprite);
 		
-			
 		//draw prizes
 		for (unsigned int i = 0; i < prizes.size(); ++i)
 		{
@@ -378,8 +387,7 @@ public:
 				pointer = &indestructibleSprite;
 			DrawSprite(prizes[i].px, prizes[i].py, pointer);
 		}
-
-
+		
 		//display score
 		DrawString(0, 0, "Score: " + std::to_string(score), olc::DARK_YELLOW);
 
@@ -407,6 +415,8 @@ public:
 		return true;
 	}
 };
+
+
 int main()
 {
 	SpaceInvaders demo;
