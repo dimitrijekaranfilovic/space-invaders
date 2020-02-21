@@ -34,7 +34,8 @@ struct Projectile
 	float px, py;
 	float kx, ky;
 	float speed = 2.0f;
-	int w=2, h=4;
+	int w=4, h=10;
+	bool used = false;
 };
 
 struct Prize
@@ -124,10 +125,10 @@ struct Boss
 		return y0 + (x - x0) * (y1 - y0) / (x1 - x0);
 	}
 
-	void shoot()
-	{
+	
+	
 
-	}
+	
 
 
 };

@@ -93,6 +93,7 @@ public:
 			obstacles.clear();
 			bullets.clear();
 			prizes.clear();
+			boss.projectiles.clear();
 			scoreLowerBound = 0;
 			scoreUpperBound = 5;
 			numObstacles = 1;
@@ -248,12 +249,12 @@ public:
 						scoreUpperBound += 5;
 						obstacleSpeed *= 1.15f;
 					}
-					/*if (score % 1 == 0 || (pointCount == 2 && score % 20 == 1))
+					if (score % 1 == 0 || (pointCount == 2 && score % 20 == 1))
 					{
 						boss.active = true;
 						boss.setHealth(boss.maxHealth + 10);
 						boss.parts *= 0.85f;
-					}*/
+					}
 				}
 			}
 		}
@@ -265,6 +266,7 @@ public:
 			{
 				boss.active = false;
 				boss.appeared = 0.0f;
+				boss.projectiles.clear();
 			}
 			else
 			{
@@ -277,6 +279,13 @@ public:
 					}
 				}
 			}
+		}
+
+		//check if any of the boss' projectiles have hit the ship
+		for (unsigned int i = 0; i < boss.projectiles.size(); ++i)
+		{ 
+			if (squareSquareCollision(ship.px, ship.py, boss.projectiles[i].px, boss.projectiles[i].py, SHIP_WIDTH, boss.projectiles[i].w, SCREEN_HEIGHT, boss.projectiles[i].h))
+				gameOver = true;
 		}
 
 
@@ -310,26 +319,59 @@ public:
 			}
 		}
 
-		//decide whether to dive or to shoot
-		if (boss.active && boss.currentHealth < 10 && boss.appeared > 3)
+		//update projectile position
+		if (boss.active && !gameOver)
 		{
-			//std::cout << boss.appeared << std::endl;
-			int num = rand() % 3000;
-			if (num < 30 && !boss.doTheDive)
-				boss.dive(ship.px, ship.py);
+			for (unsigned int i = 0; i < boss.projectiles.size(); ++i)
+			{
+				boss.projectiles[i].py += boss.projectiles[i].speed;
+			}
 		}
 
-		else if (boss.active && boss.currentHealth >= 10 && boss.appeared > 3)
+		//decide whether to dive or to shoot
+		if (boss.active && boss.currentHealth < 10 && boss.appeared > 3 && !gameOver)
 		{
 			//std::cout << boss.appeared << std::endl;
 			int num = rand() % 3000;
-			if (num < 20 && !boss.doTheDive)
+			if (num < 15 && !boss.doTheDive)
 				boss.dive(ship.px, ship.py);
+			else if (num >= 15 && num < 30)
+			{
+				//shoot
+				for (unsigned int i = 0; i < 3; ++i)
+				{
+					Projectile p;
+					p.px = boss.px + i * BOSS_SIZE / 3 * 1.0f;
+					p.py = boss.py;
+					boss.projectiles.push_back(p);
+				}
+				
+			}
+		}
+
+		else if (boss.active && boss.currentHealth >= 10 && boss.appeared > 3 && !gameOver)
+		{
+			//std::cout << boss.appeared << std::endl;
+			int num = rand() % 3000;
+			if (num < 10 && !boss.doTheDive)
+				boss.dive(ship.px, ship.py);
+			else if (num >= 10 && num < 25)
+			{
+				//shoot
+				for (unsigned int i = 0; i < 3; ++i)
+				{
+					Projectile p;
+					p.px = boss.px + i * BOSS_SIZE / 3 * 1.0f;
+					p.py = boss.py;
+					boss.projectiles.push_back(p);
+				}
+			}
 		}
 
 		//dive in the calculated direction
 		if (boss.active && boss.doTheDive && !gameOver)
 		{
+			std::cout << boss.appeared << std::endl;
 			boss.px += (boss.q * boss.speed);
 			boss.py = boss.interpolate(boss.px);
 
@@ -360,6 +402,9 @@ public:
 		prizes.erase(std::remove_if(prizes.begin(), prizes.end(), [](const Prize& p) {return p.collected || p.py > SCREEN_HEIGHT; }), prizes.end());
 		if (boss.active)
 			prizes.clear();
+
+		//remove projectiles that went out of bounds
+		boss.projectiles.erase(std::remove_if(boss.projectiles.begin(), boss.projectiles.end(), [](const Projectile& p) {return p.used || p.py > SCREEN_HEIGHT; }), boss.projectiles.end());
 
 		//clear screen	
 		FillRect(0, 0, ScreenWidth(), ScreenHeight(), olc::BLACK);
@@ -409,7 +454,12 @@ public:
 			else if (prizes[i].kind == Prize::INDESTRUCTIBLE)
 				pointer = &indestructibleSprite;
 			DrawSprite(prizes[i].px, prizes[i].py, pointer);
+		}
 
+		for (unsigned int i = 0; i < boss.projectiles.size(); ++i)
+		{
+			DrawRect(boss.projectiles[i].px, boss.projectiles[i].py, boss.projectiles[i].w, boss.projectiles[i].h, olc::DARK_BLUE);
+			FillRect(boss.projectiles[i].px, boss.projectiles[i].py, boss.projectiles[i].w, boss.projectiles[i].h, olc::DARK_BLUE);
 
 		}
 
@@ -446,6 +496,11 @@ public:
 			else if (prizes[i].kind == Prize::INDESTRUCTIBLE)
 				DrawRect(prizes[i].px, prizes[i].py, STRENGTH_SIZE, STRENGTH_SIZE, olc::CRIMSON);
 		}
+
+		for (unsigned int i = 0; i < boss.projectiles.size(); ++i)
+			DrawRect(boss.projectiles[i].px, boss.projectiles[i].py, boss.projectiles[i].w, boss.projectiles[i].h, olc::DARK_BLUE);
+
+		
 
 #endif
 
