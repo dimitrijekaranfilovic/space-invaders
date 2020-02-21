@@ -73,9 +73,14 @@ public:
 		if ((GetKey(olc::Key::LEFT).bHeld || GetKey(olc::Key::A).bHeld) && ship.px > 0 && !gameOver)
 			ship.px -= ship.speed;
 
-		if ((GetKey(olc::Key::RIGHT).bHeld || GetKey(olc::Key::D).bHeld) && (ship.px < ScreenWidth() - ship.sprite.width) && !gameOver)
+		if ((GetKey(olc::Key::RIGHT).bHeld || GetKey(olc::Key::D).bHeld) && (ship.px < ScreenWidth() - SHIP_WIDTH) && !gameOver)
 			ship.px += ship.speed;
 
+		/*if ((GetKey(olc::Key::UP).bHeld || GetKey(olc::Key::W).bHeld) && ship.py > 0 && !gameOver)
+			ship.py -= ship.speed;
+
+		if ((GetKey(olc::Key::DOWN).bHeld || GetKey(olc::Key::S).bHeld) && (ship.py + SHIP_HEIGHT < SCREEN_HEIGHT) && !gameOver)
+			ship.py += ship.speed;*/
 
 		if (GetKey(olc::Key::SPACE).bPressed && !gameOver)
 		{
@@ -370,7 +375,7 @@ public:
 		DrawSprite(ship.px, ship.py, &ship.sprite);
 
 
-		//drawing boss and its health
+		//draw boss and its health
 		if (boss.active)
 		{
 			DrawSprite(boss.px, boss.py, &boss.sprite);
@@ -412,7 +417,7 @@ public:
 		//draw ship
 		DrawRect(ship.px, ship.py, SHIP_WIDTH, SHIP_HEIGHT, olc::ORANGE);
 
-		//drawing boss and its health
+		//draw boss and its health
 		if (boss.active)
 		{
 			DrawRect(boss.px, boss.py, BOSS_SIZE, BOSS_SIZE, olc::DARK_RED);
