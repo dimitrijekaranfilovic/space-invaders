@@ -18,12 +18,9 @@
 #define BULLET_HEIGHT 14
 #define BULLET_WIDTH 3
 #define BOSS_SIZE 40
-#define INF 999999
 #define BOSS_X 170
 #define BOSS_Y 60
 
-#define SP << fixed << setw( 15 ) << setprecision( 6 ) <<
-#define NL << '\n'
 
 struct Star
 {
@@ -81,14 +78,18 @@ struct Boss
 {
 	float px = BOSS_X;
 	float py = BOSS_Y;
-	float parts = 50;
+	float parts = 60;
+	float appeared = 0.0f;
 	
 	bool active = false;
 	bool doTheDive = false;
+
 	float y0, x0, y1, x1, speed;
 	float q;
+
 	int currentHealth;
 	int maxHealth;
+
 	olc::Sprite sprite;
 	std::string imagePath = "../resources/boss4.png";
 	std::vector<Projectile> projectiles;
@@ -113,7 +114,7 @@ struct Boss
 		doTheDive = true;
 		if (px > ship_x)
 			q = -1;
-		else
+		else 
 			q = 1;
 
 	}
@@ -121,6 +122,11 @@ struct Boss
 	float interpolate(float x)
 	{
 		return y0 + (x - x0) * (y1 - y0) / (x1 - x0);
+	}
+
+	void shoot()
+	{
+
 	}
 
 

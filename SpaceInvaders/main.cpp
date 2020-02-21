@@ -99,8 +99,9 @@ public:
 			ship.px = 150.0f;
 			ship.py = 350.0f;
 			boss.setHealth(10);
-			boss.parts = 30;
+			boss.parts = 60;
 			boss.active = false;
+			boss.appeared = 0.0f;
 		}
 
 		//update bullets' positions
@@ -244,7 +245,7 @@ public:
 					{
 						boss.active = true;
 						boss.setHealth(boss.maxHealth + 10);
-						boss.parts *= 1.25;
+						boss.parts *= 0.85f;
 					}						
 				}
 			}
@@ -254,7 +255,10 @@ public:
 		if (boss.active)
 		{
 			if (boss.currentHealth == 0)
+			{
 				boss.active = false;
+				boss.appeared = 0.0f;
+			}
 			else
 			{
 				for (unsigned int i = 0; i < bullets.size(); ++i)
@@ -299,11 +303,20 @@ public:
 			}
 		}
 
-		//decide whether to dive
-		if (boss.active)
+		//decide whether to dive or to shoot
+		if (boss.active && boss.currentHealth < 10 && boss.appeared > 3)
 		{
+			std::cout << boss.appeared << std::endl;
 			int num = rand() % 3000;
-			if (num < 10 && !boss.doTheDive)
+			if (num < 30 && !boss.doTheDive)
+				boss.dive(ship.px, ship.py);
+		}
+
+		else if (boss.active && boss.currentHealth >= 10 && boss.appeared > 3)
+		{
+			std::cout << boss.appeared << std::endl;
+			int num = rand() % 3000;
+			if (num < 20 && !boss.doTheDive)
 				boss.dive(ship.px, ship.py);
 		}
 
@@ -320,6 +333,9 @@ public:
 				boss.doTheDive = false;
 			}
 		}
+
+		if (boss.active)
+			boss.appeared += fElapsedTime;
 		
 		//see if ship has collided with the boss
 		if (boss.active && squareSquareCollision(ship.px, ship.py, boss.px, boss.py, SHIP_WIDTH, BOSS_SIZE, SHIP_HEIGHT, BOSS_SIZE))
@@ -393,19 +409,19 @@ public:
 
 		//prize time remaining
 		int y = 0;
-		if (ship.indestructible && !boss.active)
+		if (ship.indestructible && !boss.active && !gameOver)
 		{
 			DrawString(100, y, "Indestructible time remaining: " + std::to_string(prizeDurationMap[Prize::INDESTRUCTIBLE]), olc::DARK_YELLOW);
 			y += 15;
 		}
 
-		if (pointCount > 1 && !boss.active)
+		if (pointCount > 1 && !boss.active && !gameOver)
 		{
 			DrawString(100, y, "Double point time remaining: " + std::to_string(prizeDurationMap[Prize::DOUBLE_POINT]), olc::DARK_YELLOW);
 			y += 15;
 		}
 
-		if (ship.speed > 2.0f && !boss.active)
+		if (ship.speed > 2.0f && !boss.active && !gameOver)
 			DrawString(100, y, "Speed boost time remaining: " + std::to_string(prizeDurationMap[Prize::SPEED]), olc::DARK_YELLOW);
 
 
