@@ -42,12 +42,14 @@ public:
 public:
 	bool OnUserCreate() override
 	{
+#if ANIMATED
 		bulletSprite.LoadFromFile("../resources/bullet14.png");
 		meteorSprite.LoadFromFile("../resources/meteor12.png");
 		speedSprite.LoadFromFile("../resources/speed10.png");
 		doublePointSprite.LoadFromFile("../resources/two5.png");
 		indestructibleSprite.LoadFromFile("../resources/strength9.png");
 		SetPixelMode(olc::Pixel::MASK);
+#endif
 		prizeDurationMap[Prize::SPEED] = 0.0f;
 		prizeDurationMap[Prize::INDESTRUCTIBLE] = 0.0f;
 		prizeDurationMap[Prize::DOUBLE_POINT] = 0.0f;
@@ -241,12 +243,12 @@ public:
 						scoreUpperBound += 5;
 						obstacleSpeed *= 1.15f;
 					}
-					if (score % 1 == 0 || (pointCount == 2 && score % 20 == 1))
+					/*if (score % 1 == 0 || (pointCount == 2 && score % 20 == 1))
 					{
 						boss.active = true;
 						boss.setHealth(boss.maxHealth + 10);
 						boss.parts *= 0.85f;
-					}						
+					}*/
 				}
 			}
 		}
@@ -306,7 +308,7 @@ public:
 		//decide whether to dive or to shoot
 		if (boss.active && boss.currentHealth < 10 && boss.appeared > 3)
 		{
-			std::cout << boss.appeared << std::endl;
+			//std::cout << boss.appeared << std::endl;
 			int num = rand() % 3000;
 			if (num < 30 && !boss.doTheDive)
 				boss.dive(ship.px, ship.py);
@@ -314,7 +316,7 @@ public:
 
 		else if (boss.active && boss.currentHealth >= 10 && boss.appeared > 3)
 		{
-			std::cout << boss.appeared << std::endl;
+			//std::cout << boss.appeared << std::endl;
 			int num = rand() % 3000;
 			if (num < 20 && !boss.doTheDive)
 				boss.dive(ship.px, ship.py);
@@ -336,11 +338,11 @@ public:
 
 		if (boss.active)
 			boss.appeared += fElapsedTime;
-		
+
 		//see if ship has collided with the boss
 		if (boss.active && squareSquareCollision(ship.px, ship.py, boss.px, boss.py, SHIP_WIDTH, BOSS_SIZE, SHIP_HEIGHT, BOSS_SIZE))
 			gameOver = true;
-		
+
 		//remove bullets that went out of bounds or have destroyed an obstacle
 		bullets.erase(std::remove_if(bullets.begin(), bullets.end(), [](const Bullet& b) {return b.used || b.py < 0; }), bullets.end());
 
@@ -363,7 +365,7 @@ public:
 			DrawCircle(stars[i].px, stars[i].py, stars[i].radius, olc::WHITE);
 			FillCircle(stars[i].px, stars[i].py, stars[i].radius, olc::WHITE);
 		}
-
+#if ANIMATED //draw sprites which represent in-game objects
 		//draw ship
 		DrawSprite(ship.px, ship.py, &ship.sprite);
 
@@ -376,7 +378,7 @@ public:
 			float q = 1.0f * boss.currentHealth / boss.maxHealth;
 			DrawLine(130, 5, 130 + q * 170, 5, olc::DARK_RED);
 		}
-			
+
 
 		//draw bullets
 		for (unsigned int i = 0; i < bullets.size(); ++i)
@@ -385,7 +387,7 @@ public:
 			DrawRect(bullets[i].px, bullets[i].py, BULLET_WIDTH, BULLET_HEIGHT, olc::YELLOW);
 			FillRect(bullets[i].px, bullets[i].py, BULLET_WIDTH, BULLET_HEIGHT, olc::YELLOW);
 		}
-			
+
 
 		//draw obstacles
 		for (unsigned int i = 0; i < obstacles.size(); ++i)
@@ -402,8 +404,47 @@ public:
 			else if (prizes[i].kind == Prize::INDESTRUCTIBLE)
 				pointer = &indestructibleSprite;
 			DrawSprite(prizes[i].px, prizes[i].py, pointer);
+
+
 		}
+
+#else //draw only rectangles(internal representation of in-game objects)
+		//draw ship
+		DrawRect(ship.px, ship.py, SHIP_WIDTH, SHIP_HEIGHT, olc::ORANGE);
+
+		//drawing boss and its health
+		if (boss.active)
+		{
+			DrawRect(boss.px, boss.py, BOSS_SIZE, BOSS_SIZE, olc::DARK_RED);
+			DrawString(80, 0, "Health ", olc::DARK_RED);
+			float q = 1.0f * boss.currentHealth / boss.maxHealth;
+			DrawLine(130, 5, 130 + q * 170, 5, olc::DARK_RED);
+		}
+
+
+		//draw bullets
+		for (unsigned int i = 0; i < bullets.size(); ++i)
+			DrawRect(bullets[i].px, bullets[i].py, BULLET_WIDTH, BULLET_HEIGHT, olc::YELLOW);
 		
+		//draw obstacles
+		for (unsigned int i = 0; i < obstacles.size(); ++i)
+			DrawRect(obstacles[i].px, obstacles[i].py, METEOR_SIZE, METEOR_SIZE, olc::MAGENTA);
+		
+
+		//draw prizes
+		for (unsigned int i = 0; i < prizes.size(); ++i)
+		{
+			if (prizes[i].kind == Prize::SPEED)
+				DrawRect(prizes[i].px, prizes[i].py, SPEED_WIDTH, SPEED_HEIGHT, olc::GREEN);
+			else if (prizes[i].kind == Prize::DOUBLE_POINT)
+				DrawRect(prizes[i].px, prizes[i].py, DOUBLE_WIDTH, SPEED_HEIGHT, olc::BLUE);
+			else if (prizes[i].kind == Prize::INDESTRUCTIBLE)
+				DrawRect(prizes[i].px, prizes[i].py, STRENGTH_SIZE, STRENGTH_SIZE, olc::CRIMSON);
+		}
+
+#endif
+
+
 		//display score
 		DrawString(0, 0, "Score: " + std::to_string(score), olc::DARK_YELLOW);
 

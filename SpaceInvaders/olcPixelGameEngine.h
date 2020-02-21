@@ -270,6 +270,8 @@ namespace olc // All OneLoneCoder stuff will now exist in the "olc" namespace
 		CYAN(0, 255, 255), DARK_CYAN(0, 128, 128), VERY_DARK_CYAN(0, 64, 64),
 		BLUE(0, 0, 255), DARK_BLUE(0, 0, 128), VERY_DARK_BLUE(0, 0, 64),
 		MAGENTA(255, 0, 255), DARK_MAGENTA(128, 0, 128), VERY_DARK_MAGENTA(64, 0, 64),
+		ORANGE(230, 120, 36),
+		CRIMSON(220, 20, 60),
 		BLACK(0, 0, 0),
 		BLANK(0, 0, 0, 0);
 

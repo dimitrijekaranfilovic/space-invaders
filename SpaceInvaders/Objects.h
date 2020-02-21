@@ -5,7 +5,6 @@
 #include <vector>
 #include <unordered_map> 
 #include <iostream>
-#include <iomanip>
 #define SCREEN_HEIGHT 400
 #define SHIP_WIDTH 14
 #define SHIP_HEIGHT 18
@@ -20,6 +19,7 @@
 #define BOSS_SIZE 40
 #define BOSS_X 170
 #define BOSS_Y 60
+#define ANIMATED 0
 
 
 struct Star
