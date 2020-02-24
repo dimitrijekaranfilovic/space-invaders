@@ -13,21 +13,22 @@ Legendary game written using C++ and olcPixelGameEngine. Shoutout to javidx9.
 <kbd>Esc</kbd> to pause the game
 
 ### Prizes
-
-![picture](resources/speed10.png)    a prize which grants you 3x the speed
-
-![picture](resources/strength9.png) a prize which grants you indestructability(collision with meteor doesn't mean game over)
-
-![picture](resources/two5.png)      a prize which which makes each point count as 2
-
+| Animated                               | Non-animated                                   | Effect                                |
+| ---------------------------------------|:----------------------------------------------:| -------------------------------------:|
+| ![picture](resources/speed10.png)      | ![picture](resources/speed-non-animated.png)   | Grants you 3x the speed               |
+| ![picture](resources/strength9.png)    | ![picture](resources/strength-non-animated.png)| Meteor crash doesn't mean game over   |
+| ![picture](resources/two5.png)         | ![picture](resources/double-non-animated.png)  | Each point counts as two              |
+    
 
 ### Other objects
+| Animated                               | Non-animated                                      | Description                           |
+| ---------------------------------------|:-------------------------------------------------:| -------------------------------------:|
+| ![picture](resources/meteor12.png)     | ![picture](resources/meteor-non-animated.png)     | An obstacle which you either avoid or destroy and win a point              |
+| ![picture](resources/spaceship21.png)  | ![picture](resources/ship-non-animated.png)       | Your ship                             |
+| ![picture](resources/bullet14.png)     | ![picture](resources/bullet-non-animated.png)     | Bullet that you fire                  |
+| ![picture](resources/boss4.png)        | ![picture](resources/boss-non-animated.png)       | Boss which appears every 10 points    |
+|![picture](resources/boss-bullet3.png)  | ![picture](resources/boss-bullet-non-animated.png)| Projectile that boss fires            |
 
-![picture](resources/meteor12.png)   an obstacle which you either avoid or destroy and win a point
-
-![picture](resources/spaceship21.png)  you
-
-![picture](resources/bullet14.png)  bullet that you fire
 
 ![picture](resources/playthrough.gif)
 
