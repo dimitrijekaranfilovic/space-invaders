@@ -90,7 +90,7 @@ struct Boss
 	float y0, x0, y1, x1, speed;
 	float q;
 
-	int numProjectiles = 3;
+	unsigned int numProjectiles = 3;
 
 	int currentHealth;
 	int maxHealth;
@@ -141,10 +141,52 @@ struct Boss
 		py = BOSS_Y;
 	}
 
-	
-	
+	void shoot()
+	{
+		for (unsigned int i = 0; i < numProjectiles; ++i)
+		{
+			Projectile p;
+			p.px = px + i * BOSS_SIZE / 3 * 1.0f;
+			p.py = py;
+			projectiles.push_back(p);
+		}
+	}
 
-	
 
+	void attack(float ship_x, float ship_y)
+	{
+		if (active && currentHealth < 10 && appeared > 2)
+		{
+			int num = rand() % 3000;
+			if (num < 15 && !doTheDive)
+				dive(ship_x, ship_y);
+			else if (num >= 15 && num < 30)
+				shoot();
+		}
 
+		else if (active && currentHealth >= 10 && appeared > 2)
+		{
+			int num = rand() % 3000;
+			if (num < 10 && !doTheDive)
+				dive(ship_x, ship_y);
+			else if (num >= 10 && num < 25)
+				shoot();
+		}
+	}
+
+	void implementDive()
+	{
+		if (active && doTheDive)
+		{
+			px += (q * speed);
+			py = interpolate(px);
+
+			if (py > SCREEN_HEIGHT)
+			{
+				px = BOSS_X;
+				py = BOSS_Y;
+				doTheDive = false;
+			}
+		}
+	}
 };
