@@ -36,6 +36,7 @@ public:
 	std::vector<Star> stars;
 	std::unordered_map<int, float> prizeDurationMap;
 	bool gameOver = false;
+	bool paused = false;
 
 	SpaceInvaders()
 	{
@@ -73,19 +74,19 @@ public:
 
 	void GetUserInput()
 	{
-		if ((GetKey(olc::Key::LEFT).bHeld || GetKey(olc::Key::A).bHeld) && ship.px > 0 && !gameOver)
+		if ((GetKey(olc::Key::LEFT).bHeld || GetKey(olc::Key::A).bHeld) && ship.px > 0 && !gameOver && !paused)
 			ship.px -= ship.speed;
 
-		if ((GetKey(olc::Key::RIGHT).bHeld || GetKey(olc::Key::D).bHeld) && (ship.px < ScreenWidth() - SHIP_WIDTH) && !gameOver)
+		if ((GetKey(olc::Key::RIGHT).bHeld || GetKey(olc::Key::D).bHeld) && (ship.px < ScreenWidth() - SHIP_WIDTH) && !gameOver && !paused)
 			ship.px += ship.speed;
 
-		if (GetKey(olc::Key::SPACE).bPressed && !gameOver)
+		if (GetKey(olc::Key::SPACE).bPressed && !gameOver && !paused)
 		{
 			Bullet b(ship.px + SHIP_WIDTH / 2, ship.py);
 			bullets.push_back(b);
 		}
 		//start a new game
-		if (gameOver && GetKey(olc::Key::ENTER).bPressed)
+		if (gameOver && GetKey(olc::Key::ENTER).bPressed && !paused)
 		{
 			obstacles.clear();
 			bullets.clear();
@@ -107,6 +108,9 @@ public:
 			boss.parts = 60;
 			boss.reset();
 		}
+
+		if (GetKey(olc::Key::ESCAPE).bPressed)
+			paused = !paused;
 	}
 
 
@@ -176,7 +180,6 @@ public:
 		//draw boss and its health
 		if (boss.active)
 		{
-			//std::cout << "Crtam na: (" << boss.px << ", " << boss.py << ")." << std::endl;
 			DrawRect(boss.px, boss.py, BOSS_SIZE, BOSS_SIZE, olc::DARK_RED);
 			DrawString(80, 0, "Health ", olc::DARK_RED);
 			float q = 1.0f * boss.currentHealth / boss.maxHealth;
@@ -235,6 +238,10 @@ public:
 
 		if (gameOver)
 			DrawString(ScreenWidth() / 2 - 50, ScreenHeight() / 2, "GAME OVER!", olc::DARK_RED, 3);
+		
+		if(paused)
+			DrawString(ScreenWidth() / 2 - 50, ScreenHeight() / 2, "PAUSED", olc::WHITE, 3);
+
 	}
 
 
@@ -286,6 +293,25 @@ public:
 		}
 	}
 
+	void ClearVectors()
+	{
+		//remove bullets that went out of bounds or have destroyed an obstacle
+		bullets.erase(std::remove_if(bullets.begin(), bullets.end(), [](const Bullet& b) {return b.used || b.py < 0; }), bullets.end());
+
+		//remove obstacles that went out of bounds or have been destroyed
+		obstacles.erase(std::remove_if(obstacles.begin(), obstacles.end(), [](const Obstacle& o) {return o.destroyed || o.py > SCREEN_HEIGHT; }), obstacles.end());
+		if (boss.active)
+			obstacles.clear();
+
+		//remove prizes that were collected or went out ouf bounds
+		prizes.erase(std::remove_if(prizes.begin(), prizes.end(), [](const Prize& p) {return p.collected || p.py > SCREEN_HEIGHT; }), prizes.end());
+		if (boss.active)
+			prizes.clear();
+
+		//remove projectiles that went out of bounds
+		boss.projectiles.erase(std::remove_if(boss.projectiles.begin(), boss.projectiles.end(), [](const Projectile& p) {return p.used || p.py > SCREEN_HEIGHT; }), boss.projectiles.end());
+	}
+
 
 	bool OnUserUpdate(float fElapsedTime) override
 	{
@@ -294,7 +320,7 @@ public:
 
 		//add obstacles
 		timePassed += fElapsedTime;
-		if ((score >= scoreLowerBound) && (score < scoreUpperBound) && (timePassed > timeBound) && !boss.active)
+		if ((score >= scoreLowerBound) && (score < scoreUpperBound) && (timePassed > timeBound) && !boss.active && !paused)
 		{
 			for (int i = 0; i < numObstacles; ++i)
 			{
@@ -320,7 +346,7 @@ public:
 			prizeDurationMap[Prize::SPEED] = 0.0f;
 			ship.speed = 2.0f;
 		}
-		else
+		else if(!paused)
 			prizeDurationMap[Prize::SPEED] = prizeDurationMap[Prize::SPEED] - fElapsedTime;
 
 		if (prizeDurationMap[Prize::DOUBLE_POINT] <= 0.0f)
@@ -328,7 +354,7 @@ public:
 			prizeDurationMap[Prize::DOUBLE_POINT] = 0.0f;
 			pointCount = 1;
 		}
-		else
+		else if(!paused)
 			prizeDurationMap[Prize::DOUBLE_POINT] = prizeDurationMap[Prize::DOUBLE_POINT] - fElapsedTime;
 
 		if (prizeDurationMap[Prize::INDESTRUCTIBLE] <= 0.0f)
@@ -336,7 +362,7 @@ public:
 			prizeDurationMap[Prize::INDESTRUCTIBLE] = 0.0f;
 			ship.indestructible = false;
 		}
-		else
+		else if(!paused)
 			prizeDurationMap[Prize::INDESTRUCTIBLE] = prizeDurationMap[Prize::INDESTRUCTIBLE] - fElapsedTime;
 
 
@@ -452,7 +478,7 @@ public:
 
 		//add prizes
 		int n = rand() % 5500;
-		if (n < 3 && !gameOver && !boss.active) //n < 3
+		if (n < 3 && !gameOver && !boss.active && !paused) //n < 3
 		{
 			Prize p;
 			p.px = (SPEED_WIDTH + (std::rand() % (ScreenWidth() - 2 * SPEED_WIDTH + 1))) * 1.0f;
@@ -462,36 +488,23 @@ public:
 		}
 
 
-		if (!gameOver)
+		if (!gameOver && !paused)
 		{
 			boss.attack(ship.px, ship.py);
 			boss.implementDive();
 		}
 
-		if (boss.active)
+		if (boss.active && !paused)
 			boss.appeared += fElapsedTime;
 
 		//see if ship has collided with the boss
 		if (boss.active && squareSquareCollision(ship.px, ship.py, boss.px, boss.py, SHIP_WIDTH, BOSS_SIZE, SHIP_HEIGHT, BOSS_SIZE))
 			gameOver = true;
 
-		//remove bullets that went out of bounds or have destroyed an obstacle
-		bullets.erase(std::remove_if(bullets.begin(), bullets.end(), [](const Bullet& b) {return b.used || b.py < 0; }), bullets.end());
-
-		//remove obstacles that went out of bounds or have been destroyed
-		obstacles.erase(std::remove_if(obstacles.begin(), obstacles.end(), [](const Obstacle& o) {return o.destroyed || o.py > SCREEN_HEIGHT; }), obstacles.end());
-		if (boss.active)
-			obstacles.clear();
-
-		//remove prizes that were collected or went out ouf bounds
-		prizes.erase(std::remove_if(prizes.begin(), prizes.end(), [](const Prize& p) {return p.collected || p.py > SCREEN_HEIGHT; }), prizes.end());
-		if (boss.active)
-			prizes.clear();
-
-		//remove projectiles that went out of bounds
-		boss.projectiles.erase(std::remove_if(boss.projectiles.begin(), boss.projectiles.end(), [](const Projectile& p) {return p.used || p.py > SCREEN_HEIGHT; }), boss.projectiles.end());
-
-		UpdatePositions();
+		
+		ClearVectors();
+		if(!paused)
+			UpdatePositions();
 		DrawObjects();
 
 		return true;
