@@ -15,6 +15,7 @@ public:
 	olc::Sprite indestructibleSprite;
 	olc::Sprite speedSprite;
 	olc::Sprite doublePointSprite;
+	olc::Sprite bossBulletSprite;
 #endif
 	Boss boss;
 	Ship ship;
@@ -51,6 +52,7 @@ public:
 		speedSprite.LoadFromFile("../resources/speed10.png");
 		doublePointSprite.LoadFromFile("../resources/two5.png");
 		indestructibleSprite.LoadFromFile("../resources/strength9.png");
+		bossBulletSprite.LoadFromFile("../resources/boss-bullet3.png");
 		SetPixelMode(olc::Pixel::MASK);
 #endif
 		prizeDurationMap[Prize::SPEED] = 0.0f;
@@ -168,8 +170,9 @@ public:
 
 		for (unsigned int i = 0; i < boss.projectiles.size(); ++i)
 		{
-			DrawRect(boss.projectiles[i].px, boss.projectiles[i].py, boss.projectiles[i].w, boss.projectiles[i].h, olc::DARK_BLUE);
-			FillRect(boss.projectiles[i].px, boss.projectiles[i].py, boss.projectiles[i].w, boss.projectiles[i].h, olc::DARK_BLUE);
+			//DrawRect(boss.projectiles[i].px, boss.projectiles[i].py, boss.projectiles[i].w, boss.projectiles[i].h, olc::DARK_BLUE);
+			//FillRect(boss.projectiles[i].px, boss.projectiles[i].py, boss.projectiles[i].w, boss.projectiles[i].h, olc::DARK_BLUE);
+			DrawSprite(boss.projectiles[i].px, boss.projectiles[i].py, &bossBulletSprite);
 
 		}
 

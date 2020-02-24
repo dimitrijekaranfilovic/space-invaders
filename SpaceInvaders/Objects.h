@@ -21,7 +21,7 @@
 #define BOSS_Y 60
 #define PROJECTILE_WIDTH 4
 #define PROJECTILE_HEIGHT 10
-#define ANIMATED 0
+#define ANIMATED 1
 
 
 struct Star
