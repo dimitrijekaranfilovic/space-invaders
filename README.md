@@ -10,6 +10,8 @@ Legendary game written using C++ and olcPixelGameEngine. Shoutout to javidx9.
 
 <kbd>Enter</kbd> to start a new game when 'Game over!' is displayed
 
+<kbd>Esc</kbd> to pause the game
+
 ### Prizes
 
 ![picture](resources/speed10.png)    a prize which grants you 3x the speed
@@ -29,5 +31,10 @@ Legendary game written using C++ and olcPixelGameEngine. Shoutout to javidx9.
 ![picture](resources/bullet14.png)  bullet that you fire
 
 ![picture](resources/playthrough.gif)
+
+**If you change macro ANIMATED from 1 to 0, gameplay looks like this:**
+
+![picture](resources/playthrough2.gif)
+
 
 **Another remark: all icons are custom designed(by me) because of copyrights, so do not be surprised by their appearance.**
