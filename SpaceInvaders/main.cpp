@@ -77,7 +77,7 @@ public:
 
 		if ((GetKey(olc::Key::RIGHT).bHeld || GetKey(olc::Key::D).bHeld) && (ship.px < ScreenWidth() - SHIP_WIDTH) && !gameOver)
 			ship.px += ship.speed;
-
+		std::cout << ship.px << std::endl;
 		/*if ((GetKey(olc::Key::UP).bHeld || GetKey(olc::Key::W).bHeld) && ship.py > 0 && !gameOver)
 			ship.py -= ship.speed;
 
@@ -281,6 +281,16 @@ public:
 				gameOver = true;
 		}
 
+		//check if any of the projectiles have collided with any of the bullets
+		for (unsigned int i = 0; i < boss.projectiles.size(); ++i)
+		{
+			for (unsigned int j = 0; j < bullets.size(); ++j)
+			{
+				if (squareSquareCollision(boss.projectiles[i].px, boss.projectiles[i].py, bullets[j].px, bullets[j].py, PROJECTILE_WIDTH, BULLET_WIDTH, PROJECTILE_HEIGHT, BULLET_HEIGHT))
+					bullets[j].used = true;
+			}
+		}
+
 		//add prizes
 		int n = rand() % 5500;
 		if (n < 3 && !gameOver && !boss.active) //n < 3
@@ -315,20 +325,18 @@ public:
 		{
 			for (unsigned int i = 0; i < boss.projectiles.size(); ++i)
 				boss.projectiles[i].py += boss.projectiles[i].speed;
-			
 		}
 
 		//decide whether to dive or to shoot
-		if (boss.active && boss.currentHealth < 10 && /*boss.appeared > 2 &&*/ !gameOver)
+		if (boss.active && boss.currentHealth < 10 && boss.appeared > 2 && !gameOver)
 		{
-			//std::cout << boss.appeared << std::endl;
 			int num = rand() % 3000;
 			if (num < 15 && !boss.doTheDive)
 				boss.dive(ship.px, ship.py);
 			else if (num >= 15 && num < 30)
 			{
 				//shoot
-				for (unsigned int i = 0; i < 3; ++i)
+				for (unsigned int i = 0; i < boss.numProjectiles; ++i)
 				{
 					Projectile p;
 					p.px = boss.px + i * BOSS_SIZE / 3 * 1.0f;
@@ -338,16 +346,15 @@ public:
 			}
 		}
 
-		else if (boss.active && boss.currentHealth >= 10 && /*boss.appeared > 2 &&*/ !gameOver)
+		else if (boss.active && boss.currentHealth >= 10 && boss.appeared > 2 && !gameOver)
 		{
-			//std::cout << boss.appeared << std::endl;
 			int num = rand() % 3000;
 			if (num < 10 && !boss.doTheDive)
 				boss.dive(ship.px, ship.py);
 			else if (num >= 10 && num < 25)
 			{
 				//shoot
-				for (unsigned int i = 0; i < 3; ++i)
+				for (unsigned int i = 0; i < boss.numProjectiles; ++i)
 				{
 					Projectile p;
 					p.px = boss.px + i * BOSS_SIZE / 3 * 1.0f;
@@ -358,9 +365,8 @@ public:
 		}
 
 		//dive in the calculated direction
-		if (boss.active && boss.doTheDive && !gameOver && boss.appeared > 2)
+		if (boss.active && boss.doTheDive && !gameOver)
 		{
-			//std::cout << boss.appeared << std::endl;
 			boss.px += (boss.q * boss.speed);
 			boss.py = boss.interpolate(boss.px);
 
@@ -370,6 +376,7 @@ public:
 				boss.py = BOSS_Y;
 				boss.doTheDive = false;
 			}
+			
 		}
 
 		if (boss.active)
@@ -459,6 +466,7 @@ public:
 		//draw boss and its health
 		if (boss.active)
 		{
+			//std::cout << "Crtam na: (" << boss.px << ", " << boss.py << ")." << std::endl;
 			DrawRect(boss.px, boss.py, BOSS_SIZE, BOSS_SIZE, olc::DARK_RED);
 			DrawString(80, 0, "Health ", olc::DARK_RED);
 			float q = 1.0f * boss.currentHealth / boss.maxHealth;

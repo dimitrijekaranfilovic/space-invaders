@@ -90,6 +90,8 @@ struct Boss
 	float y0, x0, y1, x1, speed;
 	float q;
 
+	int numProjectiles = 3;
+
 	int currentHealth;
 	int maxHealth;
 
@@ -109,6 +111,8 @@ struct Boss
 
 	void dive(float ship_x, float ship_y)
 	{
+		if (ship_x == px)
+			ship_x += METEOR_SIZE - SHIP_WIDTH;
 		speed = abs(ship_x - px) / parts * 1.0f;
 		x0 = px;
 		y0 = py;
