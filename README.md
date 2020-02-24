@@ -21,12 +21,14 @@ Legendary game written using C++ and olcPixelGameEngine. Shoutout to javidx9.
     
 
 ### Other objects
+| Animated                               | Non-animated                                      | Description                           |
+| ---------------------------------------|:-------------------------------------------------:| -------------------------------------:|
+| ![picture](resources/meteor12.png)     | ![picture](resources/meteor-non-animated.png)     | An obstacle which you either avoid or destroy and win a point              |
+| ![picture](resources/spaceship21.png)  | ![picture](resources/ship-non-animated.png)       | Your ship                             |
+| ![picture](resources/bullet14.png)     | ![picture](resources/bullet-non-animated.png)     | Bullet that you fire                  |
+| ![picture](resources/boss4.png)        | ![picture](resources/boss-non-animated.png)       | Boss which appears every 10 points    |
+|![picture](resources/boss-bullet3.png)  | ![picture](resources/boss-bullet-non-animated.png)| Projectile that boss fires            |
 
-![picture](resources/meteor12.png)   an obstacle which you either avoid or destroy and win a point
-
-![picture](resources/spaceship21.png)  you
-
-![picture](resources/bullet14.png)  bullet that you fire
 
 ![picture](resources/playthrough.gif)
 
