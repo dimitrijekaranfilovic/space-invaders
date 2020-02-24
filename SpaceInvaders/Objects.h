@@ -19,6 +19,8 @@
 #define BOSS_SIZE 40
 #define BOSS_X 170
 #define BOSS_Y 60
+#define PROJECTILE_WIDTH 4
+#define PROJECTILE_HEIGHT 10
 #define ANIMATED 0
 
 
@@ -123,6 +125,16 @@ struct Boss
 	float interpolate(float x)
 	{
 		return y0 + (x - x0) * (y1 - y0) / (x1 - x0);
+	}
+
+	void reset()
+	{
+		active = false;
+		appeared = 0.0f;
+		projectiles.clear();
+		doTheDive = false;
+		px = BOSS_X;
+		py = BOSS_Y;
 	}
 
 	

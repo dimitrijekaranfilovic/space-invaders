@@ -9,11 +9,13 @@ class SpaceInvaders : public olc::PixelGameEngine
 {
 
 public:
+#if ANIMATED
 	olc::Sprite bulletSprite;
 	olc::Sprite meteorSprite;
 	olc::Sprite indestructibleSprite;
 	olc::Sprite speedSprite;
 	olc::Sprite doublePointSprite;
+#endif
 	Boss boss;
 	Ship ship;
 	int prizeDurationLimit = 5;
@@ -108,8 +110,7 @@ public:
 			ship.py = 350.0f;
 			boss.setHealth(10);
 			boss.parts = 60;
-			boss.active = false;
-			boss.appeared = 0.0f;
+			boss.reset();
 		}
 
 		//update bullets' positions
@@ -127,7 +128,7 @@ public:
 			{
 				if (!gameOver)
 				{
-					int x = meteorSprite.width + (std::rand() % (ScreenWidth() - 2 * meteorSprite.width + 1));
+					int x = METEOR_SIZE + (std::rand() % (ScreenWidth() - 2 * METEOR_SIZE + 1));
 					Obstacle o(x * 1.0f, quotient * i * 1.0f);
 					obstacles.push_back(o);
 				}
@@ -145,9 +146,7 @@ public:
 		for (unsigned int i = 0; i < obstacles.size(); ++i)
 		{
 			if (squareSquareCollision(ship.px, ship.py, obstacles[i].px, obstacles[i].py, SHIP_WIDTH, METEOR_SIZE, SHIP_HEIGHT, METEOR_SIZE) && !ship.indestructible)
-			{
 				gameOver = true;
-			}
 			else
 			{
 				if (!gameOver)
@@ -165,7 +164,6 @@ public:
 		else
 			prizeDurationMap[Prize::SPEED] = prizeDurationMap[Prize::SPEED] - fElapsedTime;
 
-
 		if (prizeDurationMap[Prize::DOUBLE_POINT] <= 0.0f)
 		{
 			prizeDurationMap[Prize::DOUBLE_POINT] = 0.0f;
@@ -174,13 +172,11 @@ public:
 		else
 			prizeDurationMap[Prize::DOUBLE_POINT] = prizeDurationMap[Prize::DOUBLE_POINT] - fElapsedTime;
 
-
 		if (prizeDurationMap[Prize::INDESTRUCTIBLE] <= 0.0f)
 		{
 			prizeDurationMap[Prize::INDESTRUCTIBLE] = 0.0f;
 			ship.indestructible = false;
 		}
-
 		else
 			prizeDurationMap[Prize::INDESTRUCTIBLE] = prizeDurationMap[Prize::INDESTRUCTIBLE] - fElapsedTime;
 
@@ -228,6 +224,7 @@ public:
 				}
 			}
 		}
+
 		//check if any of the obstacles were destroyed and update parameters
 		for (unsigned int i = 0; i < obstacles.size(); ++i)
 		{
@@ -263,11 +260,7 @@ public:
 		if (boss.active)
 		{
 			if (boss.currentHealth == 0)
-			{
-				boss.active = false;
-				boss.appeared = 0.0f;
-				boss.projectiles.clear();
-			}
+				boss.reset();	
 			else
 			{
 				for (unsigned int i = 0; i < bullets.size(); ++i)
@@ -284,17 +277,16 @@ public:
 		//check if any of the boss' projectiles have hit the ship
 		for (unsigned int i = 0; i < boss.projectiles.size(); ++i)
 		{ 
-			if (squareSquareCollision(ship.px, ship.py, boss.projectiles[i].px, boss.projectiles[i].py, SHIP_WIDTH, boss.projectiles[i].w, SCREEN_HEIGHT, boss.projectiles[i].h))
+			if (squareSquareCollision(ship.px, ship.py, boss.projectiles[i].px, boss.projectiles[i].py, SHIP_WIDTH, PROJECTILE_WIDTH, SHIP_HEIGHT, PROJECTILE_HEIGHT))
 				gameOver = true;
 		}
-
 
 		//add prizes
 		int n = rand() % 5500;
 		if (n < 3 && !gameOver && !boss.active) //n < 3
 		{
 			Prize p;
-			p.px = (speedSprite.width + (std::rand() % (ScreenWidth() - 2 * speedSprite.width + 1))) * 1.0f;
+			p.px = (SPEED_WIDTH + (std::rand() % (ScreenWidth() - 2 * SPEED_WIDTH + 1))) * 1.0f;
 			p.py = 0;
 			p.kind = rand() % 3;
 			prizes.push_back(p);
@@ -315,7 +307,6 @@ public:
 				stars[i].py += obstacleSpeed;
 				if (stars[i].py > SCREEN_HEIGHT)
 					stars[i].py = 0;
-
 			}
 		}
 
@@ -323,13 +314,12 @@ public:
 		if (boss.active && !gameOver)
 		{
 			for (unsigned int i = 0; i < boss.projectiles.size(); ++i)
-			{
 				boss.projectiles[i].py += boss.projectiles[i].speed;
-			}
+			
 		}
 
 		//decide whether to dive or to shoot
-		if (boss.active && boss.currentHealth < 10 && boss.appeared > 3 && !gameOver)
+		if (boss.active && boss.currentHealth < 10 && /*boss.appeared > 2 &&*/ !gameOver)
 		{
 			//std::cout << boss.appeared << std::endl;
 			int num = rand() % 3000;
@@ -345,11 +335,10 @@ public:
 					p.py = boss.py;
 					boss.projectiles.push_back(p);
 				}
-				
 			}
 		}
 
-		else if (boss.active && boss.currentHealth >= 10 && boss.appeared > 3 && !gameOver)
+		else if (boss.active && boss.currentHealth >= 10 && /*boss.appeared > 2 &&*/ !gameOver)
 		{
 			//std::cout << boss.appeared << std::endl;
 			int num = rand() % 3000;
@@ -369,9 +358,9 @@ public:
 		}
 
 		//dive in the calculated direction
-		if (boss.active && boss.doTheDive && !gameOver)
+		if (boss.active && boss.doTheDive && !gameOver && boss.appeared > 2)
 		{
-			std::cout << boss.appeared << std::endl;
+			//std::cout << boss.appeared << std::endl;
 			boss.px += (boss.q * boss.speed);
 			boss.py = boss.interpolate(boss.px);
 
