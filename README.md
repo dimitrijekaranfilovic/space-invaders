@@ -20,7 +20,6 @@ Legendary game written using C++ and olcPixelGameEngine. Shoutout to javidx9.
 
 ![picture](resources/two5.png)      a prize which which makes each point count as 2
 
-**Remark: Each prize lasts for 5 seconds.**
 
 ### Other objects
 
@@ -36,5 +35,7 @@ Legendary game written using C++ and olcPixelGameEngine. Shoutout to javidx9.
 
 ![picture](resources/playthrough2.gif)
 
-
-**Another remark: all icons are custom designed(by me) because of copyrights, so do not be surprised by their appearance.**
+## Additional information
+* All icons are custom designed(by me) because of copyrights, so do not be surprised by their appearance.
+* Exe file included in this project is the version without any icons.
+* Each prize lasts for 5 seconds.
