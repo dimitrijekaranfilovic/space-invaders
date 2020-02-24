@@ -38,5 +38,5 @@ Legendary game written using C++ and olcPixelGameEngine. Shoutout to javidx9.
 
 ## Additional information
 * All icons are custom designed(by me) because of copyrights, so do not be surprised by their appearance.
-* Exe file included in this project is the version without any icons.
+* Exe file included in this project is the non-animated version.
 * Each prize lasts for 5 seconds.
