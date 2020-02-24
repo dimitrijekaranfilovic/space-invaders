@@ -13,13 +13,12 @@ Legendary game written using C++ and olcPixelGameEngine. Shoutout to javidx9.
 <kbd>Esc</kbd> to pause the game
 
 ### Prizes
-
-![picture](resources/speed10.png)    a prize which grants you 3x the speed
-
-![picture](resources/strength9.png) a prize which grants you indestructability(collision with meteor doesn't mean game over)
-
-![picture](resources/two5.png)      a prize which which makes each point count as 2
-
+| Animated                               | Non-animated                                   | Effect                                |
+| ---------------------------------------|:----------------------------------------------:| -------------------------------------:|
+| ![picture](resources/speed10.png)      | ![picture](resources/speed-non-animated.png)   | Grants you 3x the speed               |
+| ![picture](resources/strength9.png)    | ![picture](resources/strength-non-animated.png)| Meteor crash doesn't mean game over   |
+| ![picture](resources/two5.png)         | ![picture](resources/double-non-animated.png)  | Each point counts as two              |
+    
 
 ### Other objects
 
