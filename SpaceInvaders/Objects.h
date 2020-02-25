@@ -17,7 +17,7 @@
 #define SPEED_WIDTH 13
 #define BULLET_HEIGHT 14
 #define BULLET_WIDTH 3
-#define BOSS_SIZE 40
+#define BOSS_SIZE 38
 #define BOSS_X 170
 #define BOSS_Y 60
 #define PROJECTILE_WIDTH 4
