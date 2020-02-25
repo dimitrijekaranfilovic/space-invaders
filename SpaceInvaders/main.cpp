@@ -118,7 +118,7 @@ public:
 			prizeDurationMap[Prize::SPEED] = 0.0f;
 		}
 
-		if (GetKey(olc::Key::ESCAPE).bPressed)
+		if (GetKey(olc::Key::ESCAPE).bPressed && !gameOver)
 			paused = !paused;
 	}
 
@@ -215,7 +215,8 @@ public:
 
 		//draw boss projectiles
 		for (unsigned int i = 0; i < boss.projectiles.size(); ++i)
-			DrawRect(boss.projectiles[i].px, boss.projectiles[i].py, PROJECTILE_WIDTH, PROJECTILE_HEIGHT, olc::DARK_BLUE);
+			//DrawRect(boss.projectiles[i].px, boss.projectiles[i].py, PROJECTILE_WIDTH, PROJECTILE_HEIGHT, olc::DARK_BLUE);
+			DrawCircle(boss.projectiles[i].px, boss.projectiles[i].py, PROJECTILE_WIDTH, olc::DARK_BLUE);
 		
 			
 #endif
@@ -486,7 +487,7 @@ public:
 		//check if any of the boss' projectiles have hit the ship
 		for (unsigned int i = 0; i < boss.projectiles.size(); ++i)
 		{ 
-			if (squareSquareCollision(ship.px, ship.py, boss.projectiles[i].px, boss.projectiles[i].py, SHIP_WIDTH, PROJECTILE_WIDTH, SHIP_HEIGHT, PROJECTILE_HEIGHT))
+			if (squareSquareCollision(ship.px, ship.py, boss.projectiles[i].px, boss.projectiles[i].py, SHIP_WIDTH, PROJECTILE_WIDTH, SHIP_HEIGHT, PROJECTILE_WIDTH))
 				gameOver = true;
 		}
 
@@ -495,7 +496,7 @@ public:
 		{
 			for (unsigned int j = 0; j < bullets.size(); ++j)
 			{
-				if (squareSquareCollision(boss.projectiles[i].px, boss.projectiles[i].py, bullets[j].px, bullets[j].py, PROJECTILE_WIDTH, BULLET_WIDTH, PROJECTILE_HEIGHT, BULLET_HEIGHT))
+				if (squareSquareCollision(boss.projectiles[i].px, boss.projectiles[i].py, bullets[j].px, bullets[j].py, PROJECTILE_WIDTH, BULLET_WIDTH, PROJECTILE_WIDTH, BULLET_HEIGHT))
 					bullets[j].used = true;
 			}
 		}
