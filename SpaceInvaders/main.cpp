@@ -292,7 +292,21 @@ public:
 		if (boss.active && !gameOver)
 		{
 			for (unsigned int i = 0; i < boss.projectiles.size(); ++i)
-				boss.projectiles[i].py += boss.projectiles[i].speed;
+			{
+				float s = boss.projectiles[i].speed * sqrt(2) / 2;
+				if (boss.projectiles[i].dir == Projectile::LEFT)
+				{
+					boss.projectiles[i].px -= s;
+					boss.projectiles[i].py += s;
+				}
+				else if (boss.projectiles[i].dir == Projectile::RIGHT)
+				{
+					boss.projectiles[i].px += s;
+					boss.projectiles[i].py += s;
+				}
+				else if(boss.projectiles[i].dir == Projectile::MIDDLE)
+					boss.projectiles[i].py += boss.projectiles[i].speed;
+			}
 		}
 	}
 
@@ -434,7 +448,7 @@ public:
 						scoreUpperBound += 5;
 						obstacleSpeed *= 1.15f;
 					}
-					if (score % 10 == 0 || (pointCount == 2 && score % 10 == 1))
+					if (score % 1 == 0 || (pointCount == 2 && score % 10 == 1))
 					{
 						boss.active = true;
 						boss.setHealth(boss.maxHealth + 10);

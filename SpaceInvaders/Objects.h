@@ -35,6 +35,8 @@ struct Projectile
 {
 	float px, py;
 	float speed = 2.0f;
+	int dir;
+	enum Direction {LEFT = 0, MIDDLE = 1, RIGHT = 2};
 };
 
 struct Prize
@@ -145,6 +147,7 @@ struct Boss
 			Projectile p;
 			p.px = px + i * BOSS_SIZE / 3 * 1.0f;
 			p.py = py + BOSS_SIZE;
+			p.dir = i;
 			projectiles.push_back(p);
 		}
 	}
