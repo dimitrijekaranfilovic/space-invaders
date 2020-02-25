@@ -21,7 +21,7 @@
 #define BOSS_Y 60
 #define PROJECTILE_WIDTH 4
 #define PROJECTILE_HEIGHT 10
-#define ANIMATED 1
+#define ANIMATED 0
 
 
 struct Star
@@ -147,7 +147,7 @@ struct Boss
 		{
 			Projectile p;
 			p.px = px + i * BOSS_SIZE / 3 * 1.0f;
-			p.py = py;
+			p.py = py + BOSS_SIZE;
 			projectiles.push_back(p);
 		}
 	}
