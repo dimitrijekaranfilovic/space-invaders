@@ -29,6 +29,11 @@ Legendary game written using C++ and olcPixelGameEngine. Shoutout to javidx9.
 | ![picture](resources/boss4.png)        | ![picture](resources/boss-non-animated.png)  | Boss which appears every 10 points    |
 |![picture](resources/circle2.png)       | ![picture](resources/circle.png)             | Projectile that boss fires            |
 
+## Additional information
+* All icons are custom designed(by me) because of copyrights, so do not be surprised by their appearance.
+* Exe file included in this project is the non-animated version.
+* Each prize lasts for 5 seconds.
+
 
 ## Gameplay gifs
 
@@ -38,7 +43,4 @@ Legendary game written using C++ and olcPixelGameEngine. Shoutout to javidx9.
 
 ![picture](resources/playthrough2.gif)
 
-## Additional information
-* All icons are custom designed(by me) because of copyrights, so do not be surprised by their appearance.
-* Exe file included in this project is the non-animated version.
-* Each prize lasts for 5 seconds.
+
