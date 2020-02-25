@@ -145,7 +145,6 @@ public:
 		//draw bullets
 		for (unsigned int i = 0; i < bullets.size(); ++i)
 		{
-			//DrawSprite(bullets[i].px, bullets[i].py, &bulletSprite);
 			DrawRect(bullets[i].px, bullets[i].py, BULLET_WIDTH, BULLET_HEIGHT, olc::YELLOW);
 			FillRect(bullets[i].px, bullets[i].py, BULLET_WIDTH, BULLET_HEIGHT, olc::YELLOW);
 		}
@@ -169,12 +168,9 @@ public:
 		}
 
 		for (unsigned int i = 0; i < boss.projectiles.size(); ++i)
-		{
-			//DrawRect(boss.projectiles[i].px, boss.projectiles[i].py, boss.projectiles[i].w, boss.projectiles[i].h, olc::DARK_BLUE);
-			//FillRect(boss.projectiles[i].px, boss.projectiles[i].py, boss.projectiles[i].w, boss.projectiles[i].h, olc::DARK_BLUE);
 			DrawSprite(boss.projectiles[i].px, boss.projectiles[i].py, &bossBulletSprite);
 
-		}
+		
 
 #else //draw only rectangles(internal representation of in-game objects)
 		//draw ship
@@ -210,11 +206,11 @@ public:
 				DrawRect(prizes[i].px, prizes[i].py, STRENGTH_SIZE, STRENGTH_SIZE, olc::CRIMSON);
 		}
 
+		//draw boss projectiles
 		for (unsigned int i = 0; i < boss.projectiles.size(); ++i)
 			DrawRect(boss.projectiles[i].px, boss.projectiles[i].py, PROJECTILE_WIDTH, PROJECTILE_HEIGHT, olc::DARK_BLUE);
-
-
-
+		
+			
 #endif
 
 
@@ -296,12 +292,12 @@ public:
 				float s = boss.projectiles[i].speed * sqrt(2) / 2;
 				if (boss.projectiles[i].dir == Projectile::LEFT)
 				{
-					boss.projectiles[i].px -= s;
+					boss.projectiles[i].px -= s * 0.5;
 					boss.projectiles[i].py += s;
 				}
 				else if (boss.projectiles[i].dir == Projectile::RIGHT)
 				{
-					boss.projectiles[i].px += s;
+					boss.projectiles[i].px += s * 0.5;
 					boss.projectiles[i].py += s;
 				}
 				else if(boss.projectiles[i].dir == Projectile::MIDDLE)
@@ -523,7 +519,7 @@ public:
 		if(!paused)
 			UpdatePositions();
 		DrawObjects();
-
+		
 		return true;
 	}
 };

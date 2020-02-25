@@ -5,6 +5,7 @@
 #include <vector>
 #include <unordered_map> 
 #include <iostream>
+#include <math.h>
 #define SCREEN_HEIGHT 400
 #define SHIP_WIDTH 14
 #define SHIP_HEIGHT 18
