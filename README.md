@@ -30,7 +30,7 @@ Legendary game written using C++ and olcPixelGameEngine. Shoutout to javidx9.
 |![picture](resources/boss-bullet3.png)  | ![picture](resources/boss-bullet-non-animated.png)| Projectile that boss fires            |
 
 
-## Gameplay gif's
+## Gameplay gifs
 
 ![picture](resources/playthrough.gif)
 
