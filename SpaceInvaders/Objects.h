@@ -54,12 +54,6 @@ struct Ship
 	float px = 150.0f;
 	float py = 350.0f;
 	float speed = 2.0f;
-	olc::Sprite sprite;
-	std::string imagePath = "../resources/spaceship21.png";
-	Ship()
-	{
-		sprite.LoadFromFile(imagePath);
-	}
 	bool indestructible = false;
 };
 
@@ -94,14 +88,7 @@ struct Boss
 
 	int currentHealth;
 	int maxHealth;
-
-	olc::Sprite sprite;
-	std::string imagePath = "../resources/boss4.png";
 	std::vector<Projectile> projectiles;
-	Boss()
-	{
-		sprite.LoadFromFile(imagePath);
-	}
 	
 	void setHealth(int health)
 	{
@@ -156,7 +143,7 @@ struct Boss
 
 	void attack(float ship_x, float ship_y)
 	{
-		if (active && currentHealth < 10 && appeared > 2)
+		if (active && currentHealth < 10 && appeared > 1)
 		{
 			int num = rand() % 3000;
 			if (num < 15 && !doTheDive)
@@ -165,7 +152,7 @@ struct Boss
 				shoot();
 		}
 
-		else if (active && currentHealth >= 10 && appeared > 2)
+		else if (active && currentHealth >= 10 && appeared > 1)
 		{
 			int num = rand() % 3000;
 			if (num < 10 && !doTheDive)

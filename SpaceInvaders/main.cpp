@@ -16,6 +16,8 @@ public:
 	olc::Sprite speedSprite;
 	olc::Sprite doublePointSprite;
 	olc::Sprite bossBulletSprite;
+	olc::Sprite bossSprite;
+	olc::Sprite shipSprite;
 #endif
 	Boss boss;
 	Ship ship;
@@ -47,6 +49,8 @@ public:
 	bool OnUserCreate() override
 	{
 #if ANIMATED
+		shipSprite.LoadFromFile("../resources/spaceship21.png");
+		bossSprite.LoadFromFile("../resources/boss4.png");
 		bulletSprite.LoadFromFile("../resources/bullet14.png");
 		meteorSprite.LoadFromFile("../resources/meteor12.png");
 		speedSprite.LoadFromFile("../resources/speed10.png");
@@ -132,13 +136,13 @@ public:
 		}
 #if ANIMATED //draw sprites which represent in-game objects
 		//draw ship
-		DrawSprite(ship.px, ship.py, &ship.sprite);
+		DrawSprite(ship.px, ship.py, &shipSprite);
 
 
 		//draw boss and its health
 		if (boss.active)
 		{
-			DrawSprite(boss.px, boss.py, &boss.sprite);
+			DrawSprite(boss.px, boss.py, &bossSprite);
 			DrawString(80, 0, "Health ", olc::DARK_RED);
 			float q = 1.0f * boss.currentHealth / boss.maxHealth;
 			DrawLine(130, 5, 130 + q * 170, 5, olc::DARK_RED);
