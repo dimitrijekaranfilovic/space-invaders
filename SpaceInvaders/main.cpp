@@ -175,7 +175,10 @@ public:
 		}
 
 		for (unsigned int i = 0; i < boss.projectiles.size(); ++i)
-			DrawSprite(boss.projectiles[i].px, boss.projectiles[i].py, &bossBulletSprite);
+		{
+			DrawCircle(boss.projectiles[i].px, boss.projectiles[i].py, PROJECTILE_WIDTH, olc::DARK_BLUE);
+			FillCircle(boss.projectiles[i].px, boss.projectiles[i].py, PROJECTILE_WIDTH, olc::DARK_BLUE);
+		}
 
 		
 
