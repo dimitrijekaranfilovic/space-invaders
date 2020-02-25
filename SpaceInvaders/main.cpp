@@ -109,6 +109,9 @@ public:
 			boss.setHealth(10);
 			boss.parts = 60;
 			boss.reset();
+			prizeDurationMap[Prize::INDESTRUCTIBLE] = 0.0f;
+			prizeDurationMap[Prize::DOUBLE_POINT] = 0.0f;
+			prizeDurationMap[Prize::SPEED] = 0.0f;
 		}
 
 		if (GetKey(olc::Key::ESCAPE).bPressed)
@@ -289,15 +292,15 @@ public:
 		{
 			for (unsigned int i = 0; i < boss.projectiles.size(); ++i)
 			{
-				float s = boss.projectiles[i].speed * sqrt(2) / 2;
+				float s = boss.projectiles[i].speed * 1.41f / 2;
 				if (boss.projectiles[i].dir == Projectile::LEFT)
 				{
-					boss.projectiles[i].px -= s * 0.5;
+					boss.projectiles[i].px -= s * 0.5f;
 					boss.projectiles[i].py += s;
 				}
 				else if (boss.projectiles[i].dir == Projectile::RIGHT)
 				{
-					boss.projectiles[i].px += s * 0.5;
+					boss.projectiles[i].px += s * 0.5f;
 					boss.projectiles[i].py += s;
 				}
 				else if(boss.projectiles[i].dir == Projectile::MIDDLE)
@@ -444,11 +447,15 @@ public:
 						scoreUpperBound += 5;
 						obstacleSpeed *= 1.15f;
 					}
-					if (score % 1 == 0 || (pointCount == 2 && score % 10 == 1))
+					if (score % 10 == 0 || (pointCount == 2 && score % 10 == 1))
 					{
 						boss.active = true;
 						boss.setHealth(boss.maxHealth + 10);
 						boss.parts *= 0.85f;
+						prizeDurationMap[Prize::INDESTRUCTIBLE] = 0.0f;
+						prizeDurationMap[Prize::DOUBLE_POINT] = 0.0f;
+						prizeDurationMap[Prize::SPEED] = 0.0f;
+						
 					}
 				}
 			}
