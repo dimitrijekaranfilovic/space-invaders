@@ -211,7 +211,7 @@ public:
 		}
 
 		for (unsigned int i = 0; i < boss.projectiles.size(); ++i)
-			DrawRect(boss.projectiles[i].px, boss.projectiles[i].py, boss.projectiles[i].w, boss.projectiles[i].h, olc::DARK_BLUE);
+			DrawRect(boss.projectiles[i].px, boss.projectiles[i].py, PROJECTILE_WIDTH, PROJECTILE_HEIGHT, olc::DARK_BLUE);
 
 
 
@@ -312,7 +312,7 @@ public:
 			prizes.clear();
 
 		//remove projectiles that went out of bounds
-		boss.projectiles.erase(std::remove_if(boss.projectiles.begin(), boss.projectiles.end(), [](const Projectile& p) {return p.used || p.py > SCREEN_HEIGHT; }), boss.projectiles.end());
+		boss.projectiles.erase(std::remove_if(boss.projectiles.begin(), boss.projectiles.end(), [](const Projectile& p) {return p.py > SCREEN_HEIGHT; }), boss.projectiles.end());
 	}
 
 

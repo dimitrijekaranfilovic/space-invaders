@@ -34,10 +34,7 @@ struct Star
 struct Projectile
 {
 	float px, py;
-	float kx, ky;
 	float speed = 2.0f;
-	int w=4, h=10;
-	bool used = false;
 };
 
 struct Prize
