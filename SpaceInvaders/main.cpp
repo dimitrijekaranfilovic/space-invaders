@@ -225,7 +225,6 @@ private:
 
 		//draw boss projectiles
 		for (unsigned int i = 0; i < boss.projectiles.size(); ++i)
-			//DrawRect(boss.projectiles[i].px, boss.projectiles[i].py, PROJECTILE_WIDTH, PROJECTILE_HEIGHT, olc::DARK_BLUE);
 			DrawCircle(boss.projectiles[i].px, boss.projectiles[i].py, PROJECTILE_WIDTH, olc::DARK_BLUE);
 		
 			
@@ -395,50 +394,38 @@ public:
 		else if(!paused)
 			prizeDurationMap[Prize::INDESTRUCTIBLE] = prizeDurationMap[Prize::INDESTRUCTIBLE] - fElapsedTime;
 
-
-
 		//check if any of the prizes was collected and apply its effects
 		for (unsigned int i = 0; i < prizes.size(); ++i)
-		{
-			int w2;
-			int h2;
-			switch (prizes[i].kind)
+		{			
+			if (prizes[i].kind == Prize::DOUBLE_POINT)
 			{
-			case Prize::DOUBLE_POINT:
-				w2 = DOUBLE_WIDTH;
-				h2 = DOUBLE_HEIGHT;
-				break;
-			case Prize::INDESTRUCTIBLE:
-				w2 = STRENGTH_SIZE;
-				h2 = w2;
-				break;
-			case Prize::SPEED:
-				w2 = SPEED_WIDTH;
-				h2 = SPEED_HEIGHT;
-				break;
-			}
-			if (squareSquareCollision(ship.px, ship.py, prizes[i].px, prizes[i].py, SHIP_WIDTH, w2, SHIP_HEIGHT, h2))
-			{
-				prizes[i].collected = true;
-				switch (prizes[i].kind)
+				if (squareSquareCollision(ship.px, ship.py, prizes[i].px, prizes[i].py, SHIP_WIDTH, DOUBLE_WIDTH, SHIP_HEIGHT, DOUBLE_HEIGHT))
 				{
-				case Prize::DOUBLE_POINT:
+					prizes[i].collected = true;
 					pointCount = 2;
 					prizeDurationMap[Prize::DOUBLE_POINT] = prizeDurationMap[Prize::DOUBLE_POINT] + prizeDurationLimit;
-					break;
-				case Prize::INDESTRUCTIBLE:
+				}
+			}		
+			else if (prizes[i].kind == Prize::INDESTRUCTIBLE)
+			{
+				if (squareSquareCollision(ship.px, ship.py, prizes[i].px, prizes[i].py, SHIP_WIDTH, STRENGTH_SIZE, SHIP_HEIGHT, STRENGTH_SIZE))
+				{
+					prizes[i].collected = true;
 					ship.indestructible = true;
 					prizeDurationMap[Prize::INDESTRUCTIBLE] = prizeDurationMap[Prize::INDESTRUCTIBLE] + prizeDurationLimit;
-					break;
-				case Prize::SPEED:
-					ship.speed = 6.0f;
-					prizeDurationMap[Prize::SPEED] = prizeDurationMap[Prize::SPEED] + prizeDurationLimit;
-					break;
-				default:
-					break;
 				}
 			}
+			else if (prizes[i].kind == Prize::SPEED)
+			{
+				if (squareSquareCollision(ship.px, ship.py, prizes[i].px, prizes[i].py, SHIP_WIDTH, SPEED_WIDTH, SHIP_HEIGHT, SPEED_HEIGHT))
+				{
+					prizes[i].collected = true;
+					ship.speed = 6.0f;
+					prizeDurationMap[Prize::SPEED] = prizeDurationMap[Prize::SPEED] + prizeDurationLimit;
+				}
+			}	
 		}
+
 
 		//check if any of the obstacles were destroyed and update parameters
 		for (unsigned int i = 0; i < obstacles.size(); ++i)
