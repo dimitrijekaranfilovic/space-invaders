@@ -1,11 +1,13 @@
 #pragma once
 #define OLC_PGE_APPLICATION
 #include "olcPixelGameEngine.h"
-#include <string>
 #include <vector>
 #include <unordered_map> 
 #include <iostream>
 #include <math.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <ctime>
 #define SCREEN_HEIGHT 400
 #define SHIP_WIDTH 14
 #define SHIP_HEIGHT 18

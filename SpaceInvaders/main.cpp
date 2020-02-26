@@ -74,6 +74,7 @@ public:
 			Star s(x * 1.0f, y * 1.0f, r * 1.0f);
 			stars.push_back(s);
 		}
+		srand((unsigned)time(0));
 		return true;
 	}
 
@@ -88,7 +89,7 @@ public:
 
 		if (GetKey(olc::Key::SPACE).bPressed && !gameOver && !paused)
 		{
-			Bullet b(ship.px + SHIP_WIDTH / 2, ship.py);
+			Bullet b(ship.px + SHIP_WIDTH / 2 - BULLET_WIDTH / 2, ship.py);
 			bullets.push_back(b);
 		}
 		//start a new game
