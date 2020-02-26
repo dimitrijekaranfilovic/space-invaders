@@ -265,41 +265,41 @@ private:
 	void UpdatePositions()
 	{
 		//update bullets' positions
-		for (unsigned int i = 0; i < bullets.size(); i++)
+		if (!gameOver)
 		{
-			if (!gameOver)
+			for (unsigned int i = 0; i < bullets.size(); i++)
 				bullets[i].py -= bulletSpeed;
 		}
-
+		
+		
 		//update obstacles' positions
 		for (unsigned int i = 0; i < obstacles.size(); ++i)
 		{
 			if (squareSquareCollision(ship.px, ship.py, obstacles[i].px, obstacles[i].py, SHIP_WIDTH, METEOR_SIZE, SHIP_HEIGHT, METEOR_SIZE) && !ship.indestructible)
 				gameOver = true;
-			else
-			{
-				if (!gameOver)
+			else if(!gameOver)
 					obstacles[i].py += obstacleSpeed;
-			}
 		}
 
 		//update prizes' position
-		for (unsigned int i = 0; i < prizes.size(); ++i)
+		if (!gameOver)
 		{
-			if (!gameOver)
-				prizes[i].py += prizeSpeed;
+			for (unsigned int i = 0; i < prizes.size(); ++i)
+					prizes[i].py += prizeSpeed;
 		}
+		
 
 		//update stars positions
-		for (unsigned int i = 0; i < stars.size(); ++i)
+		if (!gameOver)
 		{
-			if (!gameOver)
+			for (unsigned int i = 0; i < stars.size(); ++i)
 			{
 				stars[i].py += obstacleSpeed;
 				if (stars[i].py > SCREEN_HEIGHT)
 					stars[i].py = 0;
 			}
 		}
+		
 
 		//update projectile position
 		if (boss.active && !gameOver)
@@ -349,16 +349,13 @@ public:
 
 		//add obstacles
 		timePassed += fElapsedTime;
-		if ((score >= scoreLowerBound) && (score < scoreUpperBound) && (timePassed > timeBound) && !boss.active && !paused)
+		if ((score >= scoreLowerBound) && (score < scoreUpperBound) && (timePassed > timeBound) && !boss.active && !paused && !gameOver)
 		{
 			for (int i = 0; i < numObstacles; ++i)
 			{
-				if (!gameOver)
-				{
-					int x = METEOR_SIZE + (std::rand() % (ScreenWidth() - 2 * METEOR_SIZE + 1));
-					Obstacle o(x * 1.0f, quotient * i * 1.0f);
-					obstacles.push_back(o);
-				}
+				int x = METEOR_SIZE + (std::rand() % (ScreenWidth() - 2 * METEOR_SIZE + 1));
+				Obstacle o(x * 1.0f, quotient * i * 1.0f);
+				obstacles.push_back(o);
 			}
 			timePassed = 0.0f;
 		}
@@ -497,6 +494,10 @@ public:
 			}
 		}
 
+		//see if ship has collided with the boss
+		if (boss.active && squareSquareCollision(ship.px, ship.py, boss.px, boss.py, SHIP_WIDTH, BOSS_SIZE, SHIP_HEIGHT, BOSS_SIZE))
+			gameOver = true;
+
 		//add prizes
 		int n = rand() % 5500;
 		if (n < 3 && !gameOver && !boss.active && !paused) //n < 3
@@ -518,11 +519,6 @@ public:
 		if (boss.active && !paused)
 			boss.appeared += fElapsedTime;
 
-		//see if ship has collided with the boss
-		if (boss.active && squareSquareCollision(ship.px, ship.py, boss.px, boss.py, SHIP_WIDTH, BOSS_SIZE, SHIP_HEIGHT, BOSS_SIZE))
-			gameOver = true;
-
-		
 		ClearVectors();
 		if(!paused)
 			UpdatePositions();
