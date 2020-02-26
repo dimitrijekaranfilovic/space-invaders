@@ -78,7 +78,7 @@ public:
 		return true;
 	}
 
-
+private:
 	void GetUserInput()
 	{
 		if ((GetKey(olc::Key::LEFT).bHeld || GetKey(olc::Key::A).bHeld) && ship.px > 0 && !gameOver && !paused)
@@ -89,7 +89,13 @@ public:
 
 		if (GetKey(olc::Key::SPACE).bPressed && !gameOver && !paused)
 		{
-			Bullet b(ship.px + SHIP_WIDTH / 2 - BULLET_WIDTH / 2, ship.py);
+			float x;
+#if ANIMATED
+			x = ship.px + SHIP_WIDTH / 2 + 1.99f;
+#else
+			x = ship.px + SHIP_WIDTH / 2 - BULLET_WIDTH / 2;
+#endif
+			Bullet b(x, ship.py);
 			bullets.push_back(b);
 		}
 		//start a new game
@@ -337,10 +343,9 @@ public:
 		boss.projectiles.erase(std::remove_if(boss.projectiles.begin(), boss.projectiles.end(), [](const Projectile& p) {return p.py > SCREEN_HEIGHT; }), boss.projectiles.end());
 	}
 
-
+public:
 	bool OnUserUpdate(float fElapsedTime) override
 	{
-		
 		GetUserInput();
 
 		//add obstacles
