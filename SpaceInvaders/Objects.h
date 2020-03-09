@@ -24,7 +24,9 @@
 #define BOSS_Y 60
 #define PROJECTILE_WIDTH 4
 #define PROJECTILE_HEIGHT 10
-#define ANIMATED 0
+#define HEART_HEIGHT 16
+#define HEART_WIDTH 10
+#define ANIMATED 1
 
 
 struct Star
@@ -39,12 +41,13 @@ struct Projectile
 	float px, py;
 	float speed = 2.0f;
 	int dir;
+	bool destroyed = false;
 	enum Direction {LEFT = 0, MIDDLE = 1, RIGHT = 2};
 };
 
 struct Prize
 {
-	enum Kind { SPEED = 0, DOUBLE_POINT = 1, INDESTRUCTIBLE = 2 };
+	enum Kind { SPEED = 0, DOUBLE_POINT = 1, INDESTRUCTIBLE = 2 , HEART = 3};
 	int kind;
 	float px;
 	float py;
@@ -57,6 +60,7 @@ struct Ship
 	float py = 350.0f;
 	float speed = 2.0f;
 	bool indestructible = false;
+	unsigned int health = 1;
 };
 
 struct Bullet

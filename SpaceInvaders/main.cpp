@@ -1,4 +1,5 @@
 #include "Objects.h"
+#define LOG(x) std::cout << x << std::endl
 
 bool squareSquareCollision(float x1, float y1, float x2, float y2, int w1, int w2, int h1, int h2)
 {
@@ -15,6 +16,7 @@ public:
 	olc::Sprite indestructibleSprite;
 	olc::Sprite speedSprite;
 	olc::Sprite doublePointSprite;
+	olc::Sprite heartSprite;
 	olc::Sprite bossBulletSprite;
 	olc::Sprite bossSprite;
 	olc::Sprite shipSprite;
@@ -52,10 +54,11 @@ public:
 		shipSprite.LoadFromFile("../resources/spaceship21.png");
 		bossSprite.LoadFromFile("../resources/boss4.png");
 		bulletSprite.LoadFromFile("../resources/bullet14.png");
-		meteorSprite.LoadFromFile("../resources/meteor12.png");
+		meteorSprite.LoadFromFile("../resources/meteor12.png"); //meteor12
 		speedSprite.LoadFromFile("../resources/speed10.png");
 		doublePointSprite.LoadFromFile("../resources/two5.png");
 		indestructibleSprite.LoadFromFile("../resources/strength9.png");
+		heartSprite.LoadFromFile("../resources/heart-animated.png");
 		bossBulletSprite.LoadFromFile("../resources/circle2.png");
 		SetPixelMode(olc::Pixel::MASK);
 #endif
@@ -113,6 +116,7 @@ private:
 			gameOver = false;
 			pointCount = 1;
 			ship.speed = 2.0f;
+			ship.health = 1;
 			obstacleSpeed = 0.5f;
 			ship.indestructible = false;
 			ship.px = 150.0f;
@@ -141,6 +145,16 @@ private:
 			DrawCircle(stars[i].px, stars[i].py, stars[i].radius, olc::WHITE);
 			FillCircle(stars[i].px, stars[i].py, stars[i].radius, olc::WHITE);
 		}
+
+
+		//draw health points
+		DrawString(0, 15, "Health", olc::RED, 1);
+		for (unsigned int i = 0; i < ship.health; ++i)
+		{
+			DrawCircle(i * 10 + 2, 30, 2, olc::RED);
+			FillCircle(i * 10 + 2, 30, 2, olc::RED);
+		}
+
 #if ANIMATED //draw sprites which represent in-game objects
 		//draw ship
 		DrawSprite(ship.px, ship.py, &shipSprite);
@@ -150,7 +164,7 @@ private:
 		if (boss.active)
 		{
 			DrawSprite(boss.px, boss.py, &bossSprite);
-			DrawString(80, 0, "Health ", olc::DARK_RED);
+			DrawString(90, 0, "Boss ", olc::DARK_RED);
 			float q = 1.0f * boss.currentHealth / boss.maxHealth;
 			DrawLine(130, 5, 130 + q * 170, 5, olc::DARK_RED);
 		}
@@ -178,6 +192,8 @@ private:
 				pointer = &doublePointSprite;
 			else if (prizes[i].kind == Prize::INDESTRUCTIBLE)
 				pointer = &indestructibleSprite;
+			else if (prizes[i].kind == Prize::HEART)
+				pointer = &heartSprite;
 			DrawSprite(prizes[i].px, prizes[i].py, pointer);
 		}
 
@@ -197,7 +213,7 @@ private:
 		if (boss.active)
 		{
 			DrawRect(boss.px, boss.py, BOSS_SIZE, BOSS_SIZE, olc::DARK_RED);
-			DrawString(80, 0, "Health ", olc::DARK_RED);
+			DrawString(90, 0, "Boss ", olc::DARK_RED);
 			float q = 1.0f * boss.currentHealth / boss.maxHealth;
 			DrawLine(130, 5, 130 + q * 170, 5, olc::DARK_RED);
 		}
@@ -221,6 +237,8 @@ private:
 				DrawRect(prizes[i].px, prizes[i].py, DOUBLE_WIDTH, SPEED_HEIGHT, olc::BLUE);
 			else if (prizes[i].kind == Prize::INDESTRUCTIBLE)
 				DrawRect(prizes[i].px, prizes[i].py, STRENGTH_SIZE, STRENGTH_SIZE, olc::CRIMSON);
+			else if (prizes[i].kind == Prize::HEART)
+				DrawRect(prizes[i].px, prizes[i].py, HEART_WIDTH, HEART_HEIGHT, olc::RED);
 		}
 
 		//draw boss projectiles
@@ -232,7 +250,7 @@ private:
 
 
 		//display score
-		DrawString(0, 0, "Score: " + std::to_string(score), olc::DARK_YELLOW);
+		DrawString(0, 0, "Score: " + std::to_string(score), olc::DARK_YELLOW, 1);
 
 		//prize time remaining
 		int y = 0;
@@ -273,13 +291,21 @@ private:
 		
 		
 		//update obstacles' positions
-		for (unsigned int i = 0; i < obstacles.size(); ++i)
+		if (!gameOver)
 		{
-			if (squareSquareCollision(ship.px, ship.py, obstacles[i].px, obstacles[i].py, SHIP_WIDTH, METEOR_SIZE, SHIP_HEIGHT, METEOR_SIZE) && !ship.indestructible)
-				gameOver = true;
-			else if(!gameOver)
+			for (unsigned int i = 0; i < obstacles.size(); ++i)
+			{
+				if (squareSquareCollision(ship.px, ship.py, obstacles[i].px, obstacles[i].py, SHIP_WIDTH, METEOR_SIZE, SHIP_HEIGHT, METEOR_SIZE) && !ship.indestructible)
+				{
+					ship.health -= 1;
+					obstacles[i].destroyed = true;
+					//LOG(ship.health);
+				}
+				else
 					obstacles[i].py += obstacleSpeed;
+			}
 		}
+		
 
 		//update prizes' position
 		if (!gameOver)
@@ -339,7 +365,7 @@ private:
 			prizes.clear();
 
 		//remove projectiles that went out of bounds
-		boss.projectiles.erase(std::remove_if(boss.projectiles.begin(), boss.projectiles.end(), [](const Projectile& p) {return p.py > SCREEN_HEIGHT; }), boss.projectiles.end());
+		boss.projectiles.erase(std::remove_if(boss.projectiles.begin(), boss.projectiles.end(), [](const Projectile& p) {return p.py > SCREEN_HEIGHT || p.destroyed; }), boss.projectiles.end());
 	}
 
 public:
@@ -391,7 +417,7 @@ public:
 		else if(!paused)
 			prizeDurationMap[Prize::INDESTRUCTIBLE] = prizeDurationMap[Prize::INDESTRUCTIBLE] - fElapsedTime;
 
-		//check if any of the prizes was collected and apply its effects
+		//check if any of the prizes were collected and apply its effects
 		for (unsigned int i = 0; i < prizes.size(); ++i)
 		{			
 			if (prizes[i].kind == Prize::DOUBLE_POINT)
@@ -421,6 +447,15 @@ public:
 					prizeDurationMap[Prize::SPEED] = prizeDurationMap[Prize::SPEED] + prizeDurationLimit;
 				}
 			}	
+
+			else if (prizes[i].kind == Prize::HEART)
+			{
+				if (squareSquareCollision(ship.px, ship.py, prizes[i].px, prizes[i].py, SHIP_WIDTH, HEART_WIDTH, SHIP_HEIGHT, HEART_HEIGHT))
+				{
+					ship.health += 1;
+					prizes[i].collected = true;
+				}
+			}
 		}
 
 
@@ -481,7 +516,10 @@ public:
 		for (unsigned int i = 0; i < boss.projectiles.size(); ++i)
 		{ 
 			if (squareSquareCollision(ship.px, ship.py, boss.projectiles[i].px, boss.projectiles[i].py, SHIP_WIDTH, PROJECTILE_WIDTH, SHIP_HEIGHT, PROJECTILE_WIDTH))
-				gameOver = true;
+			{
+				ship.health -= 1;
+				boss.projectiles[i].destroyed = true;
+			}
 		}
 
 		//check if any of the projectiles have collided with any of the bullets
@@ -505,7 +543,7 @@ public:
 			Prize p;
 			p.px = (SPEED_WIDTH + (std::rand() % (ScreenWidth() - 2 * SPEED_WIDTH + 1))) * 1.0f;
 			p.py = 0;
-			p.kind = rand() % 3;
+			p.kind = rand() % 4;
 			prizes.push_back(p);
 		}
 
@@ -519,10 +557,14 @@ public:
 		if (boss.active && !paused)
 			boss.appeared += fElapsedTime;
 
-		ClearVectors();
+		if (ship.health == 0)
+			gameOver = true;
+
 		if(!paused)
 			UpdatePositions();
 		DrawObjects();
+		ClearVectors();
+
 		
 		return true;
 	}
