@@ -38,6 +38,8 @@
 #define MOVE_RIGHT_KEY_2 olc::Key::RIGHT 
 #define PAUSE_KEY        olc::Key::ESCAPE
 #define SELECT_KEY       olc::Key::ENTER
+#define MENU_UP_KEY      olc::Key::UP
+#define MENU_DOWN_KEY    olc::Key::DOWN
 
 
 struct Star
@@ -103,7 +105,7 @@ struct Boss
 
 	unsigned int numProjectiles = 3;
 
-	int currentHealth;
+	int currentHealth = 10;
 	int maxHealth;
 	std::vector<Projectile> projectiles;
 	

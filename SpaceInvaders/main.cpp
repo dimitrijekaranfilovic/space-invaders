@@ -1,5 +1,6 @@
 #include "Objects.h"
 
+
 bool squareSquareCollision(float x1, float y1, float x2, float y2, int w1, int w2, int h1, int h2)
 {
 	return x1 + w1 >= x2 && x2 + w2 >= x1 && y1 + h1 >= y2 && y2 + h2 >= y1;
@@ -42,6 +43,7 @@ public:
 	bool gameOver = false;
 	bool paused = false;
 	bool started = false;
+	unsigned int currentIndex = 0;
 
 	SpaceInvaders()
 	{
@@ -66,7 +68,7 @@ public:
 		prizeDurationMap[Prize::INDESTRUCTIBLE] = 0.0f;
 		prizeDurationMap[Prize::DOUBLE_POINT] = 0.0f;
 
-		boss.setHealth(10);
+		//boss.setHealth(10);
 
 		//add stars to random positions
 		for (unsigned int i = 0; i < 25; ++i)
@@ -84,53 +86,82 @@ public:
 private:
 	void GetUserInput()
 	{
-		if ((GetKey(MOVE_LEFT_KEY_1).bHeld || GetKey(MOVE_LEFT_KEY_2).bHeld) && ship.px > 0 && !gameOver && !paused)
-			ship.px -= ship.speed;
-
-		if ((GetKey(MOVE_RIGHT_KEY_1).bHeld || GetKey(MOVE_RIGHT_KEY_2).bHeld) && (ship.px < ScreenWidth() - SHIP_WIDTH) && !gameOver && !paused)
-			ship.px += ship.speed;
-
-		if (GetKey(SHOOT_KEY).bPressed && !gameOver && !paused)
+		if (started)
 		{
-			float x;
+			if ((GetKey(MOVE_LEFT_KEY_1).bHeld || GetKey(MOVE_LEFT_KEY_2).bHeld) && ship.px > 0 && !gameOver && !paused)
+				ship.px -= ship.speed;
+
+			if ((GetKey(MOVE_RIGHT_KEY_1).bHeld || GetKey(MOVE_RIGHT_KEY_2).bHeld) && (ship.px < ScreenWidth() - SHIP_WIDTH) && !gameOver && !paused)
+				ship.px += ship.speed;
+
+			if (GetKey(SHOOT_KEY).bPressed && !gameOver && !paused)
+			{
+				float x;
 #if ANIMATED
-			x = ship.px + SHIP_WIDTH / 2 + 1.99f;
+				x = ship.px + SHIP_WIDTH / 2 + 1.99f;
 #else
-			x = ship.px + SHIP_WIDTH / 2 - BULLET_WIDTH / 2;
+				x = ship.px + SHIP_WIDTH / 2 - BULLET_WIDTH / 2;
 #endif
-			Bullet b(x, ship.py);
-			bullets.push_back(b);
-		}
-		//start a new game
-		if (gameOver && GetKey(NEW_GAME_KEY).bPressed && !paused)
-		{
-			obstacles.clear();
-			bullets.clear();
-			prizes.clear();
-			boss.projectiles.clear();
-			scoreLowerBound = 0;
-			scoreUpperBound = 5;
-			numObstacles = 1;
-			score = 0;
-			timeBound = 5;
-			gameOver = false;
-			pointCount = 1;
-			ship.speed = 2.0f;
-			ship.health = 1;
-			obstacleSpeed = 0.5f;
-			ship.indestructible = false;
-			ship.px = 150.0f;
-			ship.py = 350.0f;
-			boss.setHealth(10);
-			boss.parts = 60;
-			boss.reset();
-			prizeDurationMap[Prize::INDESTRUCTIBLE] = 0.0f;
-			prizeDurationMap[Prize::DOUBLE_POINT] = 0.0f;
-			prizeDurationMap[Prize::SPEED] = 0.0f;
+				Bullet b(x, ship.py);
+				bullets.push_back(b);
+			}
+			//start a new game
+			if (gameOver && GetKey(NEW_GAME_KEY).bPressed && !paused)
+			{
+				obstacles.clear();
+				bullets.clear();
+				prizes.clear();
+				boss.projectiles.clear();
+				scoreLowerBound = 0;
+				scoreUpperBound = 5;
+				numObstacles = 1;
+				score = 0;
+				timeBound = 5;
+				gameOver = false;
+				pointCount = 1;
+				ship.speed = 2.0f;
+				ship.health = 1;
+				obstacleSpeed = 0.5f;
+				ship.indestructible = false;
+				ship.px = 150.0f;
+				ship.py = 350.0f;
+				boss.setHealth(10);
+				boss.parts = 60;
+				boss.reset();
+				prizeDurationMap[Prize::INDESTRUCTIBLE] = 0.0f;
+				prizeDurationMap[Prize::DOUBLE_POINT] = 0.0f;
+				prizeDurationMap[Prize::SPEED] = 0.0f;
+			}
+
+			if (GetKey(PAUSE_KEY).bPressed && !gameOver)
+				paused = !paused;
 		}
 
-		if (GetKey(PAUSE_KEY).bPressed && !gameOver)
-			paused = !paused;
+		else
+		{
+			if (GetKey(SELECT_KEY).bPressed)
+			{
+				switch (currentIndex % 3)
+				{
+				case 0:
+					started = true;
+					break;
+				case 1:
+					break;
+				case 2:
+					break;
+				default:
+					break; 
+				}
+			}
+				
+			if (GetKey(MENU_UP_KEY).bPressed)
+				currentIndex -= 1;
+			if (GetKey(MENU_DOWN_KEY).bPressed)
+				currentIndex += 1;
+
+		}
+		
 	}
 
 
@@ -148,16 +179,21 @@ private:
 
 
 		//draw health points
-		DrawString(0, 15, "Health", olc::RED, 1);
-		for (unsigned int i = 0; i < ship.health; ++i)
+		if (started)
 		{
-			DrawCircle(i * 10 + 2, 30, 2, olc::RED);
-			FillCircle(i * 10 + 2, 30, 2, olc::RED);
+			DrawString(0, 15, "Health", olc::RED, 1);
+			for (unsigned int i = 0; i < ship.health; ++i)
+			{
+				DrawCircle(i * 10 + 2, 30, 2, olc::RED);
+				FillCircle(i * 10 + 2, 30, 2, olc::RED);
+			}
 		}
+		
 
 #if ANIMATED //draw sprites which represent in-game objects
 		//draw ship
-		DrawSprite(ship.px, ship.py, &shipSprite);
+		if(started)
+			DrawSprite(ship.px, ship.py, &shipSprite);
 
 
 		//draw boss and its health
@@ -207,7 +243,8 @@ private:
 
 #else //draw only rectangles(internal representation of in-game objects)
 		//draw ship
-		DrawRect(ship.px, ship.py, SHIP_WIDTH, SHIP_HEIGHT, olc::ORANGE);
+		if(started)
+			DrawRect(ship.px, ship.py, SHIP_WIDTH, SHIP_HEIGHT, olc::ORANGE);
 
 		//draw boss and its health
 		if (boss.active)
@@ -250,7 +287,8 @@ private:
 
 
 		//display score
-		DrawString(0, 0, "Score: " + std::to_string(score), olc::DARK_YELLOW, 1);
+		if(started)
+			DrawString(0, 0, "Score: " + std::to_string(score), olc::DARK_YELLOW, 1);
 
 		//prize time remaining
 		int y = 0;
@@ -274,9 +312,23 @@ private:
 			DrawString(ScreenWidth() / 2 - 50, ScreenHeight() / 2, "GAME OVER!", olc::DARK_RED, 3);
 		
 		if(paused)
-			DrawString(ScreenWidth() / 2 - 50, ScreenHeight() / 2, "PAUSED", olc::WHITE, 3);
+			DrawString(130, 150, "PAUSED", olc::WHITE, 3);
+
 
 	}
+
+	void DisplayMenu()
+	{
+		DrawString(40, 100, "SPACE INVADERS", olc::WHITE, 3);
+		DrawString(70, 150, "Start new game", currentIndex % 3 == 0 ? olc::RED :  olc::WHITE, 2);
+		
+		DrawString(70, 180, "Gameplay", currentIndex % 3 == 1 ? olc::RED : olc::WHITE, 2);
+		DrawString(70, 210, "Credits",  currentIndex % 3 == 2 ? olc::RED : olc::WHITE, 2);
+		
+		DrawRect(60.0f, 155 + (currentIndex % 3) * 30, 4,4, olc::RED);
+		FillRect(60.0f, 155 + (currentIndex % 3) * 30, 4, 4, olc::RED);
+	}
+
 
 
 
@@ -373,8 +425,9 @@ public:
 		GetUserInput();
 
 		//add obstacles
-		timePassed += fElapsedTime;
-		if ((score >= scoreLowerBound) && (score < scoreUpperBound) && (timePassed > timeBound) && !boss.active && !paused && !gameOver)
+		if(started)
+			timePassed += fElapsedTime;
+		if ((score >= scoreLowerBound) && (score < scoreUpperBound) && (timePassed > timeBound) && !boss.active && !paused && !gameOver && started)
 		{
 			for (int i = 0; i < numObstacles; ++i)
 			{
@@ -537,7 +590,7 @@ public:
 
 		//add prizes
 		int n = rand() % 5500;
-		if (n < 3 && !gameOver && !boss.active && !paused) //n < 3
+		if (n < 3 && !gameOver && !boss.active && !paused && started) //n < 3
 		{
 			Prize p;
 			p.px = (SPEED_WIDTH + (std::rand() % (ScreenWidth() - 2 * SPEED_WIDTH + 1))) * 1.0f;
@@ -562,6 +615,10 @@ public:
 		if(!paused)
 			UpdatePositions();
 		DrawObjects();
+		
+		if (!started)
+			DisplayMenu();
+		
 		ClearVectors();
 
 		
