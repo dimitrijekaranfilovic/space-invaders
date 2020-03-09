@@ -8,25 +8,36 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <ctime>
-#define SCREEN_HEIGHT 400
-#define SHIP_WIDTH 14
-#define SHIP_HEIGHT 18
-#define METEOR_SIZE 21
-#define DOUBLE_HEIGHT 16
-#define DOUBLE_WIDTH 18
-#define STRENGTH_SIZE 22
-#define SPEED_HEIGHT 20
-#define SPEED_WIDTH 13
-#define BULLET_HEIGHT 14
-#define BULLET_WIDTH 3
-#define BOSS_SIZE 38
-#define BOSS_X 170
-#define BOSS_Y 60
-#define PROJECTILE_WIDTH 4
+#define SCREEN_HEIGHT    400
+#define SHIP_WIDTH	      14
+#define SHIP_HEIGHT       18
+#define METEOR_SIZE       21
+#define DOUBLE_HEIGHT     16
+#define DOUBLE_WIDTH      18
+#define STRENGTH_SIZE     22
+#define SPEED_HEIGHT      20
+#define SPEED_WIDTH       13
+#define BULLET_HEIGHT     14
+#define BULLET_WIDTH       3
+#define BOSS_SIZE         38
+#define BOSS_X           170
+#define BOSS_Y            60
+#define PROJECTILE_WIDTH   4
 #define PROJECTILE_HEIGHT 10
-#define HEART_HEIGHT 16
-#define HEART_WIDTH 10
-#define ANIMATED 0
+#define HEART_HEIGHT      16
+#define HEART_WIDTH       10
+#define ANIMATED           0
+#define LOG(x) std::cout << x << std::endl
+
+///keys
+#define NEW_GAME_KEY     olc::Key::TAB
+#define SHOOT_KEY        olc::Key::SPACE
+#define MOVE_LEFT_KEY_1  olc::Key::A
+#define MOVE_LEFT_KEY_2  olc::Key::LEFT
+#define MOVE_RIGHT_KEY_1 olc::Key::D
+#define MOVE_RIGHT_KEY_2 olc::Key::RIGHT 
+#define PAUSE_KEY        olc::Key::ESCAPE
+#define SELECT_KEY       olc::Key::ENTER
 
 
 struct Star

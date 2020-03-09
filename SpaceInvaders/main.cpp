@@ -1,5 +1,4 @@
 #include "Objects.h"
-#define LOG(x) std::cout << x << std::endl
 
 bool squareSquareCollision(float x1, float y1, float x2, float y2, int w1, int w2, int h1, int h2)
 {
@@ -42,6 +41,7 @@ public:
 	std::unordered_map<int, float> prizeDurationMap;
 	bool gameOver = false;
 	bool paused = false;
+	bool started = false;
 
 	SpaceInvaders()
 	{
@@ -54,7 +54,7 @@ public:
 		shipSprite.LoadFromFile("../resources/spaceship21.png");
 		bossSprite.LoadFromFile("../resources/boss4.png");
 		bulletSprite.LoadFromFile("../resources/bullet14.png");
-		meteorSprite.LoadFromFile("../resources/meteor12.png"); //meteor12
+		meteorSprite.LoadFromFile("../resources/meteor12.png");
 		speedSprite.LoadFromFile("../resources/speed10.png");
 		doublePointSprite.LoadFromFile("../resources/two5.png");
 		indestructibleSprite.LoadFromFile("../resources/strength9.png");
@@ -84,13 +84,13 @@ public:
 private:
 	void GetUserInput()
 	{
-		if ((GetKey(olc::Key::LEFT).bHeld || GetKey(olc::Key::A).bHeld) && ship.px > 0 && !gameOver && !paused)
+		if ((GetKey(MOVE_LEFT_KEY_1).bHeld || GetKey(MOVE_LEFT_KEY_2).bHeld) && ship.px > 0 && !gameOver && !paused)
 			ship.px -= ship.speed;
 
-		if ((GetKey(olc::Key::RIGHT).bHeld || GetKey(olc::Key::D).bHeld) && (ship.px < ScreenWidth() - SHIP_WIDTH) && !gameOver && !paused)
+		if ((GetKey(MOVE_RIGHT_KEY_1).bHeld || GetKey(MOVE_RIGHT_KEY_2).bHeld) && (ship.px < ScreenWidth() - SHIP_WIDTH) && !gameOver && !paused)
 			ship.px += ship.speed;
 
-		if (GetKey(olc::Key::SPACE).bPressed && !gameOver && !paused)
+		if (GetKey(SHOOT_KEY).bPressed && !gameOver && !paused)
 		{
 			float x;
 #if ANIMATED
@@ -102,7 +102,7 @@ private:
 			bullets.push_back(b);
 		}
 		//start a new game
-		if (gameOver && GetKey(olc::Key::ENTER).bPressed && !paused)
+		if (gameOver && GetKey(NEW_GAME_KEY).bPressed && !paused)
 		{
 			obstacles.clear();
 			bullets.clear();
@@ -129,7 +129,7 @@ private:
 			prizeDurationMap[Prize::SPEED] = 0.0f;
 		}
 
-		if (GetKey(olc::Key::ESCAPE).bPressed && !gameOver)
+		if (GetKey(PAUSE_KEY).bPressed && !gameOver)
 			paused = !paused;
 	}
 
@@ -299,7 +299,6 @@ private:
 				{
 					ship.health -= 1;
 					obstacles[i].destroyed = true;
-					//LOG(ship.health);
 				}
 				else
 					obstacles[i].py += obstacleSpeed;
