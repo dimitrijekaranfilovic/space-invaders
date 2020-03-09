@@ -1,5 +1,5 @@
 #include "Objects.h"
-
+#include "Node.h"
 
 bool squareSquareCollision(float x1, float y1, float x2, float y2, int w1, int w2, int h1, int h2)
 {
@@ -44,8 +44,10 @@ public:
 	bool paused = false;
 	bool started = false;
 	unsigned int currentIndex = 0;
+	Node<std::string> root;
+	Node<std::string>* currentParentNode = nullptr;
 
-	SpaceInvaders()
+	SpaceInvaders(): root("SPACE INVADERS")
 	{
 		sAppName = "Space invaders";
 	}
@@ -79,6 +81,23 @@ public:
 			Star s(x * 1.0f, y * 1.0f, r * 1.0f);
 			stars.push_back(s);
 		}
+		//initializing menu
+		currentParentNode = &root;
+		currentParentNode = &root;
+		root.AddChild("Start new game");
+		root.AddChild("Gameplay");
+		root.AddChild("Credits");
+
+		root["Gameplay"].AddChild("Space           shoot");
+		root["Gameplay"].AddChild("A/Left arrow    move left");
+		root["Gameplay"].AddChild("D/Right arrow   move right");
+		root["Gameplay"].AddChild("Escape          pause");
+		root["Gameplay"].AddChild("Enter           new game when game is over");
+
+		root["Credits"].AddChild("Dimitrije Karanfilovic - author");
+		root["Credits"].AddChild("github");
+		root["Credits"].AddChild("Special thanks to javidx9");
+		root["Credits"]["github"].AddChild("https://github.com/dimitrijekaranfilovic");
 		srand((unsigned)time(0));
 		return true;
 	}
@@ -139,27 +158,21 @@ private:
 
 		else
 		{
+			//navigating through the menu
 			if (GetKey(SELECT_KEY).bPressed)
 			{
-				switch (currentIndex % 3)
-				{
-				case 0:
+				if (currentParentNode->children[currentIndex % currentParentNode->children.size()].data == "Start new game")
 					started = true;
-					break;
-				case 1:
-					break;
-				case 2:
-					break;
-				default:
-					break; 
-				}
+				else if (currentParentNode->children[currentIndex % currentParentNode->children.size()].children.size() > 0)
+					currentParentNode = &currentParentNode->children[currentIndex % currentParentNode->children.size()];
 			}
 				
 			if (GetKey(MENU_UP_KEY).bPressed)
 				currentIndex -= 1;
 			if (GetKey(MENU_DOWN_KEY).bPressed)
 				currentIndex += 1;
-
+			if (GetKey(MENU_BACK_KEY).bPressed && currentParentNode->parent != nullptr)
+				currentParentNode = currentParentNode->parent;
 		}
 		
 	}
@@ -319,14 +332,12 @@ private:
 
 	void DisplayMenu()
 	{
-		DrawString(40, 100, "SPACE INVADERS", olc::WHITE, 3);
-		DrawString(70, 150, "Start new game", currentIndex % 3 == 0 ? olc::RED :  olc::WHITE, 2);
+		DrawString(40, 100, root.data, olc::WHITE, 3);
 		
-		DrawString(70, 180, "Gameplay", currentIndex % 3 == 1 ? olc::RED : olc::WHITE, 2);
-		DrawString(70, 210, "Credits",  currentIndex % 3 == 2 ? olc::RED : olc::WHITE, 2);
-		
-		DrawRect(60.0f, 155 + (currentIndex % 3) * 30, 4,4, olc::RED);
-		FillRect(60.0f, 155 + (currentIndex % 3) * 30, 4, 4, olc::RED);
+		for(unsigned int i = 0; i < currentParentNode->children.size();++i)
+			DrawString(50, 150 + i * 30, currentParentNode->children[i].data, currentIndex % currentParentNode->children.size() == i ? olc::RED : olc::WHITE, 1);
+		DrawRect(40.0f, 150 + (currentIndex % currentParentNode->children.size()) * 30, 3,3, olc::RED);
+		FillRect(40.0f, 150 + (currentIndex % currentParentNode->children.size()) * 30, 3, 3, olc::RED);
 	}
 
 
@@ -632,6 +643,6 @@ int main()
 	SpaceInvaders demo;
 	if (demo.Construct(400, SCREEN_HEIGHT, 2, 2))
 		demo.Start();
-	//test
+
 	return 0;
 }

@@ -150,6 +150,7 @@
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Node.h" />
     <ClInclude Include="Objects.h" />
     <ClInclude Include="olcPixelGameEngine.h" />
   </ItemGroup>

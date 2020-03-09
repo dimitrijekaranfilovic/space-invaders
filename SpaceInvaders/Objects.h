@@ -30,7 +30,7 @@
 #define LOG(x) std::cout << x << std::endl
 
 ///keys
-#define NEW_GAME_KEY     olc::Key::TAB
+#define NEW_GAME_KEY     olc::Key::ENTER
 #define SHOOT_KEY        olc::Key::SPACE
 #define MOVE_LEFT_KEY_1  olc::Key::A
 #define MOVE_LEFT_KEY_2  olc::Key::LEFT
@@ -40,6 +40,7 @@
 #define SELECT_KEY       olc::Key::ENTER
 #define MENU_UP_KEY      olc::Key::UP
 #define MENU_DOWN_KEY    olc::Key::DOWN
+#define MENU_BACK_KEY    olc::Key::ESCAPE
 
 
 struct Star
