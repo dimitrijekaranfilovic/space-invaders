@@ -534,5 +534,6 @@ int main()
 	SpaceInvaders demo;
 	if (demo.Construct(400, SCREEN_HEIGHT, 2, 2))
 		demo.Start();
+	//test
 	return 0;
 }
