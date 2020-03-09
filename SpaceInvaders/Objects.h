@@ -26,7 +26,7 @@
 #define PROJECTILE_HEIGHT 10
 #define HEART_HEIGHT 16
 #define HEART_WIDTH 10
-#define ANIMATED 1
+#define ANIMATED 0
 
 
 struct Star
