@@ -27,6 +27,7 @@
 #define HEART_HEIGHT      16
 #define HEART_WIDTH       10
 #define ANIMATED           0
+#define CHROME             0
 #define LOG(x) std::cout << x << std::endl
 
 ///keys
@@ -37,7 +38,7 @@
 #define MOVE_RIGHT_KEY_1 olc::Key::D
 #define MOVE_RIGHT_KEY_2 olc::Key::RIGHT 
 #define PAUSE_KEY        olc::Key::ESCAPE
-#define SELECT_KEY       olc::Key::ENTER
+#define MENU_SELECT_KEY  olc::Key::ENTER
 #define MENU_UP_KEY      olc::Key::UP
 #define MENU_DOWN_KEY    olc::Key::DOWN
 #define MENU_BACK_KEY    olc::Key::ESCAPE

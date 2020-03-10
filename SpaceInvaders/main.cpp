@@ -1,7 +1,9 @@
 #include "Objects.h"
 #include "Node.h"
+#include <windows.h>
+#include <shellapi.h>
 
-bool squareSquareCollision(float x1, float y1, float x2, float y2, int w1, int w2, int h1, int h2)
+bool aabb(float x1, float y1, float x2, float y2, int w1, int w2, int h1, int h2) //axis aligned bounding box
 {
 	return x1 + w1 >= x2 && x2 + w2 >= x1 && y1 + h1 >= y2 && y2 + h2 >= y1;
 }
@@ -70,8 +72,6 @@ public:
 		prizeDurationMap[Prize::INDESTRUCTIBLE] = 0.0f;
 		prizeDurationMap[Prize::DOUBLE_POINT] = 0.0f;
 
-		//boss.setHealth(10);
-
 		//add stars to random positions
 		for (unsigned int i = 0; i < 25; ++i)
 		{
@@ -83,7 +83,6 @@ public:
 		}
 		//initializing menu
 		currentParentNode = &root;
-		currentParentNode = &root;
 		root.AddChild("Start new game");
 		root.AddChild("Gameplay");
 		root.AddChild("Credits");
@@ -94,10 +93,10 @@ public:
 		root["Gameplay"].AddChild("Escape          pause");
 		root["Gameplay"].AddChild("Enter           new game when game is over");
 
-		root["Credits"].AddChild("Dimitrije Karanfilovic - author");
-		root["Credits"].AddChild("github");
-		root["Credits"].AddChild("Special thanks to javidx9");
-		root["Credits"]["github"].AddChild("https://github.com/dimitrijekaranfilovic");
+		root["Credits"].AddChild("Dimitrije Karanfilovic");
+		root["Credits"].AddChild("	github");
+		root["Credits"].AddChild("Special thanks to javidx9");		
+		
 		srand((unsigned)time(0));
 		return true;
 	}
@@ -159,10 +158,17 @@ private:
 		else
 		{
 			//navigating through the menu
-			if (GetKey(SELECT_KEY).bPressed)
+			if (GetKey(MENU_SELECT_KEY).bPressed)
 			{
-				if (currentParentNode->children[currentIndex % currentParentNode->children.size()].data == "Start new game")
+				std::string data = currentParentNode->children[currentIndex % currentParentNode->children.size()].data;
+				if (data == "Start new game")
 					started = true;
+#if CHROME
+				else if (data == "	github")
+					system("start chrome https://github.com/dimitrijekaranfilovic");
+				else if (data == "Special thanks to javidx9")
+					system("start chrome https://www.youtube.com/channel/UC-yuWVUplUJZvieEligKBkA");
+#endif
 				else if (currentParentNode->children[currentIndex % currentParentNode->children.size()].children.size() > 0)
 					currentParentNode = &currentParentNode->children[currentIndex % currentParentNode->children.size()];
 			}
@@ -332,12 +338,15 @@ private:
 
 	void DisplayMenu()
 	{
-		DrawString(40, 100, root.data, olc::WHITE, 3);
+		DrawString(40, 100, currentParentNode->data, olc::WHITE, 3);
 		
 		for(unsigned int i = 0; i < currentParentNode->children.size();++i)
 			DrawString(50, 150 + i * 30, currentParentNode->children[i].data, currentIndex % currentParentNode->children.size() == i ? olc::RED : olc::WHITE, 1);
-		DrawRect(40.0f, 150 + (currentIndex % currentParentNode->children.size()) * 30, 3,3, olc::RED);
-		FillRect(40.0f, 150 + (currentIndex % currentParentNode->children.size()) * 30, 3, 3, olc::RED);
+		if (currentParentNode->children[currentIndex % currentParentNode->children.size()].children.size() > 0)
+		{
+			DrawRect(40.0f, 150 + (currentIndex % currentParentNode->children.size()) * 30, 3, 3, olc::RED);
+			FillRect(40.0f, 150 + (currentIndex % currentParentNode->children.size()) * 30, 3, 3, olc::RED);
+		}
 	}
 
 
@@ -358,7 +367,7 @@ private:
 		{
 			for (unsigned int i = 0; i < obstacles.size(); ++i)
 			{
-				if (squareSquareCollision(ship.px, ship.py, obstacles[i].px, obstacles[i].py, SHIP_WIDTH, METEOR_SIZE, SHIP_HEIGHT, METEOR_SIZE) && !ship.indestructible)
+				if (aabb(ship.px, ship.py, obstacles[i].px, obstacles[i].py, SHIP_WIDTH, METEOR_SIZE, SHIP_HEIGHT, METEOR_SIZE) && !ship.indestructible)
 				{
 					ship.health -= 1;
 					obstacles[i].destroyed = true;
@@ -485,7 +494,7 @@ public:
 		{			
 			if (prizes[i].kind == Prize::DOUBLE_POINT)
 			{
-				if (squareSquareCollision(ship.px, ship.py, prizes[i].px, prizes[i].py, SHIP_WIDTH, DOUBLE_WIDTH, SHIP_HEIGHT, DOUBLE_HEIGHT))
+				if (aabb(ship.px, ship.py, prizes[i].px, prizes[i].py, SHIP_WIDTH, DOUBLE_WIDTH, SHIP_HEIGHT, DOUBLE_HEIGHT))
 				{
 					prizes[i].collected = true;
 					pointCount = 2;
@@ -494,7 +503,7 @@ public:
 			}		
 			else if (prizes[i].kind == Prize::INDESTRUCTIBLE)
 			{
-				if (squareSquareCollision(ship.px, ship.py, prizes[i].px, prizes[i].py, SHIP_WIDTH, STRENGTH_SIZE, SHIP_HEIGHT, STRENGTH_SIZE))
+				if (aabb(ship.px, ship.py, prizes[i].px, prizes[i].py, SHIP_WIDTH, STRENGTH_SIZE, SHIP_HEIGHT, STRENGTH_SIZE))
 				{
 					prizes[i].collected = true;
 					ship.indestructible = true;
@@ -503,7 +512,7 @@ public:
 			}
 			else if (prizes[i].kind == Prize::SPEED)
 			{
-				if (squareSquareCollision(ship.px, ship.py, prizes[i].px, prizes[i].py, SHIP_WIDTH, SPEED_WIDTH, SHIP_HEIGHT, SPEED_HEIGHT))
+				if (aabb(ship.px, ship.py, prizes[i].px, prizes[i].py, SHIP_WIDTH, SPEED_WIDTH, SHIP_HEIGHT, SPEED_HEIGHT))
 				{
 					prizes[i].collected = true;
 					ship.speed = 6.0f;
@@ -513,7 +522,7 @@ public:
 
 			else if (prizes[i].kind == Prize::HEART)
 			{
-				if (squareSquareCollision(ship.px, ship.py, prizes[i].px, prizes[i].py, SHIP_WIDTH, HEART_WIDTH, SHIP_HEIGHT, HEART_HEIGHT))
+				if (aabb(ship.px, ship.py, prizes[i].px, prizes[i].py, SHIP_WIDTH, HEART_WIDTH, SHIP_HEIGHT, HEART_HEIGHT))
 				{
 					ship.health += 1;
 					prizes[i].collected = true;
@@ -527,7 +536,7 @@ public:
 		{
 			for (unsigned int j = 0; j < bullets.size(); ++j)
 			{
-				if (squareSquareCollision(obstacles[i].px, obstacles[i].py, bullets[j].px, bullets[j].py, METEOR_SIZE, BULLET_WIDTH, METEOR_SIZE, BULLET_HEIGHT))
+				if (aabb(obstacles[i].px, obstacles[i].py, bullets[j].px, bullets[j].py, METEOR_SIZE, BULLET_WIDTH, METEOR_SIZE, BULLET_HEIGHT))
 				{
 					obstacles[i].destroyed = true;
 					bullets[j].used = true;
@@ -566,7 +575,7 @@ public:
 			{
 				for (unsigned int i = 0; i < bullets.size(); ++i)
 				{
-					if (squareSquareCollision(bullets[i].px, bullets[i].py, boss.px, boss.py, BULLET_WIDTH, BOSS_SIZE, BULLET_HEIGHT, BOSS_SIZE))
+					if (aabb(bullets[i].px, bullets[i].py, boss.px, boss.py, BULLET_WIDTH, BOSS_SIZE, BULLET_HEIGHT, BOSS_SIZE))
 					{
 						bullets[i].used = true;
 						boss.currentHealth -= 1;
@@ -578,7 +587,7 @@ public:
 		//check if any of the boss' projectiles have hit the ship
 		for (unsigned int i = 0; i < boss.projectiles.size(); ++i)
 		{ 
-			if (squareSquareCollision(ship.px, ship.py, boss.projectiles[i].px, boss.projectiles[i].py, SHIP_WIDTH, PROJECTILE_WIDTH, SHIP_HEIGHT, PROJECTILE_WIDTH))
+			if (aabb(ship.px, ship.py, boss.projectiles[i].px, boss.projectiles[i].py, SHIP_WIDTH, PROJECTILE_WIDTH, SHIP_HEIGHT, PROJECTILE_WIDTH))
 			{
 				ship.health -= 1;
 				boss.projectiles[i].destroyed = true;
@@ -590,13 +599,13 @@ public:
 		{
 			for (unsigned int j = 0; j < bullets.size(); ++j)
 			{
-				if (squareSquareCollision(boss.projectiles[i].px, boss.projectiles[i].py, bullets[j].px, bullets[j].py, PROJECTILE_WIDTH, BULLET_WIDTH, PROJECTILE_WIDTH, BULLET_HEIGHT))
+				if (aabb(boss.projectiles[i].px, boss.projectiles[i].py, bullets[j].px, bullets[j].py, PROJECTILE_WIDTH, BULLET_WIDTH, PROJECTILE_WIDTH, BULLET_HEIGHT))
 					bullets[j].used = true;
 			}
 		}
 
 		//see if ship has collided with the boss
-		if (boss.active && squareSquareCollision(ship.px, ship.py, boss.px, boss.py, SHIP_WIDTH, BOSS_SIZE, SHIP_HEIGHT, BOSS_SIZE))
+		if (boss.active && aabb(ship.px, ship.py, boss.px, boss.py, SHIP_WIDTH, BOSS_SIZE, SHIP_HEIGHT, BOSS_SIZE))
 			gameOver = true;
 
 		//add prizes
