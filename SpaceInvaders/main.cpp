@@ -163,12 +163,10 @@ private:
 				std::string data = currentParentNode->children[currentIndex % currentParentNode->children.size()].data;
 				if (data == "Start new game")
 					started = true;
-#if CHROME
 				else if (data == "	github")
-					system("start chrome https://github.com/dimitrijekaranfilovic");
+					system("start microsoft-edge:https://github.com/dimitrijekaranfilovic");
 				else if (data == "Special thanks to javidx9")
-					system("start chrome https://www.youtube.com/channel/UC-yuWVUplUJZvieEligKBkA");
-#endif
+					system("start microsoft-edge:https://www.youtube.com/channel/UC-yuWVUplUJZvieEligKBkA");
 				else if (currentParentNode->children[currentIndex % currentParentNode->children.size()].children.size() > 0)
 					currentParentNode = &currentParentNode->children[currentIndex % currentParentNode->children.size()];
 			}
