@@ -163,12 +163,20 @@ private:
 				std::string data = currentParentNode->children[currentIndex % currentParentNode->children.size()].data;
 				if (data == "Start new game")
 					started = true;
-#if CHROME
 				else if (data == "	github")
-					system("start chrome https://github.com/dimitrijekaranfilovic");
+					system("start microsoft-edge:https://github.com/dimitrijekaranfilovic");
 				else if (data == "Special thanks to javidx9")
+<<<<<<< HEAD
 					system("start chrome https://www.youtube.com/channel/UC-yuWVUplUJZvieEligKBkA");
+#else
+				else if (data == "	github")
+					system("start microsoft-edge:https://github.com/dimitrijekaranfilovic");
+				else if (data == "Special thanks to javidx9")
+					system("start microsoft-edge:https://www.youtube.com/channel/UC-yuWVUplUJZvieEligKBkA");
 #endif
+=======
+					system("start microsoft-edge:https://www.youtube.com/channel/UC-yuWVUplUJZvieEligKBkA");
+>>>>>>> 2a873dd71b461e15a74f8ea080f50d02187f79dc
 				else if (currentParentNode->children[currentIndex % currentParentNode->children.size()].children.size() > 0)
 					currentParentNode = &currentParentNode->children[currentIndex % currentParentNode->children.size()];
 			}
@@ -352,7 +360,7 @@ private:
 
 
 
-	void UpdatePositions()
+	void UpdatePositions(float fElapsedTime)
 	{
 		//update bullets' positions
 		if (!gameOver)
@@ -633,7 +641,7 @@ public:
 			gameOver = true;
 
 		if(!paused)
-			UpdatePositions();
+			UpdatePositions(fElapsedTime);
 		DrawObjects();
 		
 		if (!started)

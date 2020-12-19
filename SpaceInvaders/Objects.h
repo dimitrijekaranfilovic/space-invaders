@@ -26,8 +26,11 @@
 #define PROJECTILE_HEIGHT 10
 #define HEART_HEIGHT      16
 #define HEART_WIDTH       10
-#define ANIMATED           0
+#define ANIMATED           1
+<<<<<<< HEAD
 #define CHROME             0
+=======
+>>>>>>> 2a873dd71b461e15a74f8ea080f50d02187f79dc
 #define LOG(x) std::cout << x << std::endl
 
 ///keys
